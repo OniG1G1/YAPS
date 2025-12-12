@@ -1,30 +1,18 @@
 [
   {
     "username": "gigi",
-    "password": "password"
+    "password": "$argon2id$v=19$m=65536,t=3,p=4$ovtD9gBFlv7N0qD8Dccj9g$swGLvq0r3GF9KUrNKwLphrZaioTRO5xFVlhbttLyPvc"
   },
   {
-    "username": "gigi2",
-    "password": "password"
+    "username": "user2",
+    "password": "$argon2id$v=19$m=65536,t=3,p=4$C626pQyd5qzVg26KnVkIlw$iWIYRFjoRxwqPwoCq5zgjhzrsyxlzpOx9dWFjZMVPNo"
   },
   {
-    "username": "gigi3",
-    "password": "password"
+    "username": "user3",
+    "password": "$argon2id$v=19$m=65536,t=3,p=4$YQGT8NC5ffNAOmV5d6zihg$MEtPEMmvQi6Nr36NqSXmpWM/DlKCymUj/EyO/2gdaTE"
   },
   {
-    "username": "gigi4",
-    "password": "password"
-  },
-  {
-    "username": "gigi6",
-    "password": "passwird"
-  },
-  {
-    "username": "gigi7",
-    "password": "password"
-  },
-  {
-    "username": "asdas",
-    "password": "asdsad"
+    "username": "user",
+    "password": "$argon2id$v=19$m=65536,t=3,p=4$X1zZ5uJOlWf4TZ3yAJdpgA$WGdNE3Zstm+HXam5vm+X2Rw63aZXmbglS/Rbus5FTM0"
   }
 ]

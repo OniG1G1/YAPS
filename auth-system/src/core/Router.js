@@ -8,6 +8,7 @@ class Router {
 
     // Default 404 handler
     this.default404 = ({ }, res) => {
+      console.log("404 - Not found")
       res.writeHead(404, { "Content-Type": "application/json" });
       res.end(JSON.stringify({
         success: false,
@@ -51,7 +52,11 @@ class Router {
 
   // Resolve a route
   resolve(method, path) {
+    if (method.toUpperCase() === "POST" && path.endsWith(".html")) {
+      path = path.replace(/\.html$/, '');
+    }
     const key = `${method.toUpperCase()}:${path}`;
+    console.log(key)
     return this.routes[key] || this.default404;
   }
 
@@ -110,7 +115,6 @@ class Router {
     const handler = this.resolve(method, pathName);
     if (handler) {
       handler(req, res);
-      console.log("test1")
       return;
     }
 
@@ -124,15 +128,19 @@ class Router {
 
     // Case 1: /<page>
     if (!ext) {
-      const potentialFile = `/pages${pathName}.html`;
-      this.serveIfExists(potentialFile, req, res);
+      const wrappedFile = `/pages${pathName}.html`;
+      fs.access(path.join(this.publicFolder, wrappedFile), fs.constants.F_OK, (err) => {
+
+        if (err) return this.default404(req, res);
+        this.serveStatic(wrappedFile, req, res);
+      });
       return true;
     }
 
     // Case 2: /<page>.html
     if (ext === ".html" && !pathName.startsWith("/pages/")) {
-      const potentialFile = `/pages${pathName}`;
-      this.serveIfExists(potentialFile, req, res);
+      res.writeHead(301, { Location: pathName.replace(/\.html$/, '') });
+      res.end();
       return true;
     }
 
@@ -145,13 +153,6 @@ class Router {
     return false; // no match
   }
 
-
-  serveIfExists(filePath, req, res) {
-    fs.access(path.join(this.publicFolder, filePath), fs.constants.F_OK, (err) => {
-      if (err) return this.default404(req, res);
-      this.serveStatic(filePath, req, res);
-    });
-  }
 
   isStaticFile(url) {
     return [".html", ".css", ".js", ".json", ".png", ".jpg"].some(ext => url.endsWith(ext));

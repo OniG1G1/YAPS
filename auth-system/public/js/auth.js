@@ -15,6 +15,7 @@ function handleAuthForm(form, endpoint, feedbackId) {
     const feedbackEl = document.getElementById(feedbackId);
 
     try {
+      console.log("Handling authentication...")
       const response = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" }, // Consider what if I DON'T send app/json type
@@ -28,13 +29,16 @@ function handleAuthForm(form, endpoint, feedbackId) {
 
       if (result.success) {
         // ✅ redirect immediately on success
-        window.location.href = "/successfulLogin.html";
+        window.location.href = "/successfulLogin";
       } else {
         // ❌ show errors inline
+        console.log("Encountered an eror during authentication.")
         feedbackEl.textContent = result.message;
         feedbackEl.classList.add("error");
       }
+      console.log("Finished handling authentication.")
     } catch (err) {
+      console.log("test1")
       feedbackEl.textContent = "An unexpected error occurred.";
       feedbackEl.classList.add("error");
     }
