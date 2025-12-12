@@ -93,44 +93,65 @@ class Router {
     const pathName = urlObj.pathname;
     const method = req.method;
 
-    console.log("Request:", urlObj.href, " \n Method:", method, "\n");
+    console.log("Request:", urlObj.href, " \nMethod:", method, "\n");
 
     // --- Redirect root to login ---
     if (method === "GET" && (pathName === "/" || pathName === "/index.html")) {
-      res.writeHead(302, { Location: "pages/login.html" });
+      res.writeHead(302, { Location: "/login" });
       res.end();
       return;
     }
 
-    // --- Serve static files ---
     if (method === "GET") {
-      // Case 1: Requested URL has an extension
-      if (this.isStaticFile(pathName)) {
-        this.serveStatic(pathName, req, res);
-        return;
-      }
-
-      /*
-      // Case 2: Requested URL has no extension → try appending .html
-      const htmlPath = `${pathName}.html`;
-      if (fs.existsSync(path.join(this.publicFolder, htmlPath))) {
-        this.serveStatic(htmlPath, req, res);
-        return;
-      }
-        */
+      if (this.handleGET(pathName, req, res)) return;
     }
 
     // --- Check registered routes ---
     const handler = this.resolve(method, pathName);
     if (handler) {
       handler(req, res);
+      console.log("test1")
       return;
     }
 
     // --- Default 404 if nothing matched ---
     this.default404(req, res);
+
   }
 
+  handleGET(pathName, req, res) {
+    const ext = path.extname(pathName);
+
+    // Case 1: /<page>
+    if (!ext) {
+      const potentialFile = `/pages${pathName}.html`;
+      this.serveIfExists(potentialFile, req, res);
+      return true;
+    }
+
+    // Case 2: /<page>.html
+    if (ext === ".html" && !pathName.startsWith("/pages/")) {
+      const potentialFile = `/pages${pathName}`;
+      this.serveIfExists(potentialFile, req, res);
+      return true;
+    }
+
+    // Case 3: static file
+    if (this.isStaticFile(pathName)) {
+      this.serveStatic(pathName, req, res);
+      return true;
+    }
+
+    return false; // no match
+  }
+
+
+  serveIfExists(filePath, req, res) {
+    fs.access(path.join(this.publicFolder, filePath), fs.constants.F_OK, (err) => {
+      if (err) return this.default404(req, res);
+      this.serveStatic(filePath, req, res);
+    });
+  }
 
   isStaticFile(url) {
     return [".html", ".css", ".js", ".json", ".png", ".jpg"].some(ext => url.endsWith(ext));

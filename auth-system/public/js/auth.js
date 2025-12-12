@@ -28,7 +28,7 @@ function handleAuthForm(form, endpoint, feedbackId) {
 
       if (result.success) {
         // ✅ redirect immediately on success
-        window.location.href = "/pages/successfulLogin.html";
+        window.location.href = "/successfulLogin.html";
       } else {
         // ❌ show errors inline
         feedbackEl.textContent = result.message;
