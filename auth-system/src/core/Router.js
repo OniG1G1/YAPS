@@ -7,7 +7,7 @@ class Router {
     this.publicFolder = publicFolder;
 
     // Default 404 handler
-    this.default404 = ({}, res) => {
+    this.default404 = ({ }, res) => {
       res.writeHead(404, { "Content-Type": "application/json" });
       res.end(JSON.stringify({
         success: false,
@@ -55,7 +55,7 @@ class Router {
     return this.routes[key] || this.default404;
   }
 
-  serveStatic(url,req, res) {
+  serveStatic(url, req, res) {
     const filePath = path.join(this.publicFolder, url);
     fs.access(filePath, fs.constants.F_OK, (err) => {
       if (err) {
@@ -96,29 +96,29 @@ class Router {
     console.log("Request:", urlObj.href, " \n Method:", method, "\n");
 
     // --- Redirect root to login ---
-  if (method === "GET" && (pathName === "/" || pathName === "/index.html")) {
-    res.writeHead(302, { Location: "/login.html" });
-    res.end();
-    return;
-  }
+    if (method === "GET" && (pathName === "/" || pathName === "/index.html")) {
+      res.writeHead(302, { Location: "pages/login.html" });
+      res.end();
+      return;
+    }
 
     // --- Serve static files ---
-  if (method === "GET") {
-    // Case 1: Requested URL has an extension
-    if (this.isStaticFile(pathName)) {
-      this.serveStatic(pathName, req, res);
-      return;
-    }
+    if (method === "GET") {
+      // Case 1: Requested URL has an extension
+      if (this.isStaticFile(pathName)) {
+        this.serveStatic(pathName, req, res);
+        return;
+      }
 
-    /*
-    // Case 2: Requested URL has no extension → try appending .html
-    const htmlPath = `${pathName}.html`;
-    if (fs.existsSync(path.join(this.publicFolder, htmlPath))) {
-      this.serveStatic(htmlPath, req, res);
-      return;
+      /*
+      // Case 2: Requested URL has no extension → try appending .html
+      const htmlPath = `${pathName}.html`;
+      if (fs.existsSync(path.join(this.publicFolder, htmlPath))) {
+        this.serveStatic(htmlPath, req, res);
+        return;
+      }
+        */
     }
-      */
-  }
 
     // --- Check registered routes ---
     const handler = this.resolve(method, pathName);

@@ -11,7 +11,7 @@ const handleSignup = (req, res) => {
       const data = JSON.parse(body);
       const { username, password } = data;
 
-      // Missing fields → 400
+      // Missing fields: 400
       if (!username || !password) {
         res.writeHead(400, { "Content-Type": "application/json" });
         res.end(JSON.stringify({ success: false, message: "Missing username or password." }));
@@ -21,7 +21,7 @@ const handleSignup = (req, res) => {
       // Call service
       const result = userService.createUser(username, password);
 
-      // Logical failure → 200, success flag indicates outcome
+      // Logical failure: 200, success flag indicates outcome
       res.writeHead(200, { "Content-Type": "application/json" });
       res.end(JSON.stringify(result));
 
@@ -32,8 +32,6 @@ const handleSignup = (req, res) => {
     }
   });
 };
-
-
 
 const handleLogin = (req, res) => {
   let body = "";

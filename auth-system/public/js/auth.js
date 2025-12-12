@@ -17,7 +17,7 @@ function handleAuthForm(form, endpoint, feedbackId) {
     try {
       const response = await fetch(endpoint, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json" }, // Consider what if I DON'T send app/json type
         body: JSON.stringify(data),
       });
 
@@ -28,7 +28,7 @@ function handleAuthForm(form, endpoint, feedbackId) {
 
       if (result.success) {
         // ✅ redirect immediately on success
-        window.location.href = "/home.html";
+        window.location.href = "/pages/successfulLogin.html";
       } else {
         // ❌ show errors inline
         feedbackEl.textContent = result.message;

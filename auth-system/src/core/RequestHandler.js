@@ -1,3 +1,9 @@
+/*
+--------------------
+||   DEPRECATED   ||
+--------------------
+*/
+
 const fs = require("fs");
 const path = require("path");
 const UserController = require("../controllers/UserController");
