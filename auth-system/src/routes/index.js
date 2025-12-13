@@ -1,9 +1,9 @@
-const registerUserRoutes = require("./UserRoutes");
-// const registerPostRoutes = require("./postRoutes"); // later
+const routeModules = [
+  require("./UserRoutes"),
+];
 
 function registerRoutes(router) {
-  registerUserRoutes(router);
-  // registerPostRoutes(router);
+  routeModules.forEach(mod => mod(router));
 }
 
 module.exports = registerRoutes;

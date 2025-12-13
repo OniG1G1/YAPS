@@ -1,9 +1,18 @@
 document.addEventListener("DOMContentLoaded", () => {
-  const loginForm = document.querySelector("form[action='/login']") || document.getElementById("loginForm");
-  const signupForm = document.querySelector("form[action='/signup']") || document.getElementById("signupForm");
+  const loginForm =
+    document.querySelector("form[action='/login']") || document.getElementById("loginForm");
+  const signupForm =
+    document.querySelector("form[action='/signup']") || document.getElementById("signupForm");
 
-  if (loginForm) handleAuthForm(loginForm, "/login", "loginFeedback");
-  if (signupForm) handleAuthForm(signupForm, "/signup", "signupFeedback");
+  if (loginForm) {
+    console.log("[Auth] Login form initialized");
+    handleAuthForm(loginForm, "/login", "loginFeedback");
+  }
+
+  if (signupForm) {
+    console.log("[Auth] Signup form initialized");
+    handleAuthForm(signupForm, "/signup", "signupFeedback");
+  }
 });
 
 function handleAuthForm(form, endpoint, feedbackId) {
@@ -14,31 +23,33 @@ function handleAuthForm(form, endpoint, feedbackId) {
     const data = Object.fromEntries(formData.entries());
     const feedbackEl = document.getElementById(feedbackId);
 
+    // Reset UI state
+    feedbackEl.classList.remove("error", "success");
+
     try {
-      console.log("Handling authentication...")
+      console.log(`[Auth] POST ${endpoint}`, data);
       const response = await fetch(endpoint, {
         method: "POST",
-        headers: { "Content-Type": "application/json" }, // Consider what if I DON'T send app/json type
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       });
 
-      const result = await response.json();
+      console.log(`[Auth] Response status: ${response.status}`);
 
-      // Clear old styles
-      feedbackEl.classList.remove("error", "success");
+      const result = await response.json();
+      console.log("[Auth] Response body:", result);
 
       if (result.success) {
-        // ✅ redirect immediately on success
+        console.log("[Auth] Authentication successful → redirect");
         window.location.href = "/successfulLogin";
       } else {
-        // ❌ show errors inline
-        console.log("Encountered an eror during authentication.")
+        console.warn("[Auth] Authentication failed:", result.message);
         feedbackEl.textContent = result.message;
         feedbackEl.classList.add("error");
       }
-      console.log("Finished handling authentication.")
+
     } catch (err) {
-      console.log("test1")
+      console.error("[Auth] Network or parsing error:", err);
       feedbackEl.textContent = "An unexpected error occurred.";
       feedbackEl.classList.add("error");
     }

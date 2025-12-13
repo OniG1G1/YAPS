@@ -21,59 +21,63 @@ class UserService {
   saveUser(user) {
     const users = this.getAllUsers();
     users.push(user);
-    fs.writeFileSync(this.usersPath, JSON.stringify(users, null, 2), "utf8");
+    fs.writeFileSync(this.usersPath, JSON.stringify(users, null, 2));
   }
 
   findUser(username) {
-    return this.getAllUsers().find(u => u.username === username); 
+    return this.getAllUsers().find(u => u.username === username);
   }
 
   async createUser(username, password) {
     if (!username.trim() || !password.trim()) {
-      //return { success: false, message: "Invalid username or password." };
-      console.log("NOTIFICATION: Invalid username or password")
-      return createResponse(false, "Invalid username or password.")
+      console.log("[UserService] invalid signup input");
+      return response(false, "Invalid username or password.")
     }
 
     if (this.findUser(username)) {
-      console.log("NOTIFICATION: Username already exists")
-      return { success: false, message: "Username already exists." };
+      console.log("[UserService] username exists:", username);
+      return response(false, "Username already exists.");
     }
 
-    console.log("Creating User...")
     try {
-      // Hashed password
+      console.log("[UserService] hashing password");
       const hashedPassword = await argon2.hash(password)
 
-      const user = new User(username, hashedPassword);
-      this.saveUser(user);
-      return { success: true, message: "Signup successful!" };
+      this.saveUser(new User(username, hashedPassword));
+      return response(true, "Signup successful!");
+
     } catch (err) {
-      console.error("Error hashing password:", err)
-      return { success: false, message: "Internal error saving error. Try again." };
+      console.error("[UserService] signup error:", err.message);
+      return response(false, "Internal error. Try again.");
     }
   }
 
   async authenticateUser(username, password) {
     const user = this.findUser(username);
-    if (!user) return { success: false, message: "User not found." };
-
-    try {
-      // Verify password against stored hash
-      const isValid = await argon2.verify(user.password, password);
-      if (!isValid) return {success: false, message: "Incorrect password."}
-
-      return { success: true, message: "Login successful!" }; 
-    } catch (err) {
-      console.error("Error verifying password:", err);
-      return {success: false, message: "Internal error verifying password. Try again."}
+    if (!user) {
+      console.log("[UserService] login failed: user not found");
+      return response(false, "User not found.");
     }
 
+    try {
+      const isValid = await argon2.verify(user.password, password);
+      if (!isValid) {
+        console.log("[UserService] login failed: bad password");
+        return response(false, "Incorrect password.");
+      }
+
+      console.log("[UserService] login success:", username);
+      return response(true, "Login successful!");
+
+    } catch (err) {
+      console.error("[UserService] verification error:", err.message);
+      return response(false, "Internal error. Try again.");
+    }
   }
 }
 
-function createResponse(outcome, msg) {
-  return {success: outcome, message: msg};
+function response(success, message) {
+  return { success, message };
 }
 
 module.exports = new UserService();

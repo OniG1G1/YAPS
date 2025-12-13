@@ -1,173 +1,158 @@
-const path = require('path');
-const fs = require('fs');
+const path = require("path");
+const fs = require("fs");
 
 class Router {
   constructor(publicFolder = path.join(__dirname, "../../public")) {
-    this.routes = {}; // { "METHOD:PATH": handler }
+    this.routes = {};
     this.publicFolder = publicFolder;
 
-    // Default 404 handler
-    this.default404 = ({ }, res) => {
-      console.log("404 - Not found")
+    this.default404 = (req, res) => {
+      console.warn(`[404] ${req.method} ${req.url}`);
       res.writeHead(404, { "Content-Type": "application/json" });
-      res.end(JSON.stringify({
-        success: false,
-        message: "404 - Not Found"
-      }));
+      res.end(JSON.stringify({ success: false, message: "404 - Not Found" }));
     };
-    // Default invalid JSON handler
+
     this.invalidJsonHandler = (req, res) => {
+      console.warn(`[400] Invalid JSON`);
       res.writeHead(400, { "Content-Type": "application/json" });
-      res.end(JSON.stringify({
-        success: false,
-        message: "Invalid JSON"
-      }));
+      res.end(JSON.stringify({ success: false, message: "Invalid JSON" }));
     };
   }
+
+  /* ===== ROUTES ===== */
 
   register(method, path, handler) {
-    const key = `${method.toUpperCase()}:${path}`;
-    this.routes[key] = handler;
+    this.routes[`${method}:${path}`] = handler;
   }
 
-  // Register GET route
   get(path, handler) {
     this.register("GET", path, handler);
   }
 
-  // Register POST route
   post(path, handler) {
     this.register("POST", path, handler);
   }
 
-  /*
-  put(path, handler) {
-    this.register("PUT", path, handler);
-  }
+  /* ===== REQUEST ENTRY ===== */
 
-  delete(path, handler) {
-    this.register("DELETE", path, handler);
-  }
-    */
-
-  // Resolve a route
-  resolve(method, path) {
-    if (method.toUpperCase() === "POST" && path.endsWith(".html")) {
-      path = path.replace(/\.html$/, '');
-    }
-    const key = `${method.toUpperCase()}:${path}`;
-    console.log(key)
-    return this.routes[key] || this.default404;
-  }
-
-  serveStatic(url, req, res) {
-    const filePath = path.join(this.publicFolder, url);
-    fs.access(filePath, fs.constants.F_OK, (err) => {
-      if (err) {
-        this.default404(req, res);
-        return;
-      }
-
-      fs.readFile(filePath, (err, data) => {
-        if (err) {
-          this.default404(req, res);
-          return;
-        }
-
-        // Lookup content type
-        const mimeTypes = {
-          ".html": "text/html",
-          ".css": "text/css",
-          ".js": "application/javascript",
-          ".json": "application/json",
-          ".png": "image/png",
-          ".jpg": "image/jpeg"
-        };
-        const ext = path.extname(url);
-        const contentType = mimeTypes[ext] || "application/octet-stream";
-
-        res.writeHead(200, { "Content-Type": contentType });
-        res.end(data);
-      });
-    });
-  }
-
-  // Handle a request
   handle(req, res) {
     const urlObj = new URL(req.url, `http://${req.headers.host}`);
-    const pathName = urlObj.pathname;
+    let pathName = urlObj.pathname;
     const method = req.method;
 
-    console.log("Request:", urlObj.href, " \nMethod:", method, "\n");
+    console.log(`[REQ] ${method} ${pathName}`);
 
-    // --- Redirect root to login ---
+    // Root redirect
     if (method === "GET" && (pathName === "/" || pathName === "/index.html")) {
+      console.log("↪ Redirecting / → /login");
       res.writeHead(302, { Location: "/login" });
       res.end();
       return;
     }
 
+    // Pages / assets
     if (method === "GET") {
-      if (this.handleGET(pathName, req, res)) return;
-    }
-
-    // --- Check registered routes ---
-    const handler = this.resolve(method, pathName);
-    if (handler) {
-      handler(req, res);
+      this.handleGET(pathName, req, res);
       return;
     }
 
-    // --- Default 404 if nothing matched ---
-    this.default404(req, res);
+    // API
+    pathName = this.normalizeApiPath(pathName);
+    const handler = this.routes[`${method}:${pathName}`];
 
+    if (!handler) {
+      console.warn(`[MISS] No API route for ${method} ${pathName}`);
+      return this.default404(req, res);
+    }
+
+    console.log(`[API] ${method} ${pathName}`);
+    handler(req, res);
   }
+
+  /* ===== GET HANDLING ===== */
 
   handleGET(pathName, req, res) {
     const ext = path.extname(pathName);
 
-    // Case 1: /<page>
+    // /page → /pages/page.html
     if (!ext) {
-      const wrappedFile = `/pages${pathName}.html`;
-      fs.access(path.join(this.publicFolder, wrappedFile), fs.constants.F_OK, (err) => {
-
-        if (err) return this.default404(req, res);
-        this.serveStatic(wrappedFile, req, res);
-      });
-      return true;
+      return this.servePage(pathName, req, res);
     }
 
-    // Case 2: /<page>.html
+    // Canonical URL
     if (ext === ".html" && !pathName.startsWith("/pages/")) {
-      res.writeHead(301, { Location: pathName.replace(/\.html$/, '') });
+      console.log(`↪ Canonical redirect ${pathName}`);
+      res.writeHead(301, { Location: pathName.replace(/\.html$/, "") });
       res.end();
-      return true;
+      return;
     }
 
-    // Case 3: static file
+    // Static assets
     if (this.isStaticFile(pathName)) {
-      this.serveStatic(pathName, req, res);
-      return true;
+      console.log(`[STATIC] ${pathName}`);
+      return this.serveStatic(pathName, req, res);
     }
 
-    return false; // no match
+    this.default404(req, res);
   }
 
+  servePage(pathName, req, res) {
+    const filePath = `/pages${pathName}.html`;
+    const absPath = path.join(this.publicFolder, filePath);
+
+    fs.access(absPath, fs.constants.F_OK, err => {
+      if (err) {
+        console.warn(`[MISS] Page not found ${filePath}`);
+        return this.default404(req, res);
+      }
+
+      console.log(`[PAGE] ${filePath}`);
+      this.serveStatic(filePath, req, res);
+    });
+  }
+
+  /* ===== STATIC FILES ===== */
+
+  serveStatic(url, req, res) {
+    const filePath = path.join(this.publicFolder, url);
+
+    fs.readFile(filePath, (err, data) => {
+      if (err) {
+        console.error(`[ERR] Failed to read ${url}`);
+        return this.default404(req, res);
+      }
+
+      const mimeTypes = {
+        ".html": "text/html",
+        ".css": "text/css",
+        ".js": "application/javascript",
+        ".json": "application/json",
+        ".png": "image/png",
+        ".jpg": "image/jpeg"
+      };
+
+      res.writeHead(200, {
+        "Content-Type": mimeTypes[path.extname(url)] || "application/octet-stream"
+      });
+      res.end(data);
+    });
+  }
 
   isStaticFile(url) {
-    return [".html", ".css", ".js", ".json", ".png", ".jpg"].some(ext => url.endsWith(ext));
+    return [".html", ".css", ".js", ".json", ".png", ".jpg"].some(ext =>
+      url.endsWith(ext)
+    );
   }
 
-  // Optional: override default 404
-  set404Handler(handler) {
-    this.default404 = handler;
-  }
+  /* ===== API HELPERS ===== */
 
-  // Optional: override invalid JSON handler
-  setInvalidJsonHandler(handler) {
-    this.invalidJsonHandler = handler;
+  normalizeApiPath(pathName) {
+    if (pathName.endsWith(".html")) {
+      console.warn(`[API] Stripped .html from ${pathName}`);
+      return pathName.replace(/\.html$/, "");
+    }
+    return pathName;
   }
 }
 
 module.exports = Router;
-

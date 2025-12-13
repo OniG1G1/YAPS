@@ -1,79 +1,71 @@
-const path = require('path');
-const querystring = require("querystring");
 const userService = require("../services/UserService");
 
 const handleSignup = (req, res) => {
-  console.log("Handling signup...")
   let body = "";
-  req.on("data", chunk => (body += chunk.toString()));
-  req.on("end", () => {
-    try {
-      // Parse JSON body
-      console.log("Grabbing 'Sign Up' details...")
-      const data = JSON.parse(body);
-      const { username, password } = data;
 
-      // Missing fields: 400
+  req.on("data", chunk => (body += chunk));
+  req.on("end", async () => {
+    try {
+      const { username, password } = JSON.parse(body);
+
       if (!username || !password) {
-        res.writeHead(400, { "Content-Type": "application/json" });
-        res.end(JSON.stringify({ success: false, message: "Missing username or password." }));
-        console.log("Missing username or password.")
+        console.log("[Signup] missing credentials");
+        return sendJson(res, 400, false, "Missing username or password.")
         return;
       }
 
-      // Call service
-      console.log("Calling User Service...")
-      const result = userService.createUser(username, password);
+      console.log("[Signup] processing user:", username);
+      const result = await userService.createUser(username, password);
 
-      // Logical failure: 200, success flag indicates outcome
-      res.writeHead(200, { "Content-Type": "application/json" });
-      res.end(JSON.stringify(result));
-
-      console.log("'Sign Up' finished.")
+      console.log("[Signup] result:", result.success);
+      sendJson(res, 200, result.success, result.message);
     } catch (err) {
-      // JSON parse error or unexpected server error
-      res.writeHead(400, { "Content-Type": "application/json" });
-      res.end(JSON.stringify({ success: false, message: "Invalid request format." }));
-      console.log("Invalid request format.")
+      console.error("[Signup] invalid request", err.message);
+      sendJson(res, 400, false, "Invalid request format.")
     }
   });
 };
 
 const handleLogin = (req, res) => {
   let body = "";
-  req.on("data", chunk => (body += chunk.toString()));
-  req.on("end", () => {
-    try {
-      // Parse JSON body
-      const data = JSON.parse(body);
-      const { username, password } = data;
 
-      // Missing fields → 400
+  req.on("data", chunk => (body += chunk));
+  req.on("end", async () => {
+    try {
+      const { username, password } = JSON.parse(body);
+
       if (!username || !password) {
-        res.writeHead(400, { "Content-Type": "application/json" });
-        res.end(JSON.stringify({ success: false, message: "Missing username or password." }));
-        console.log("Missing username or password.")
-        return;
+        console.log("[Login] missing credentials");
+        return sendJson(res, 400, false, "Missing username or password.");
       }
 
-      // Call service
-      const result = userService.authenticateUser(username, password);
+      console.log("[Login] authenticating:", username);
+      const result = await userService.authenticateUser(username, password);
 
-      // Logical failure → 200
-      res.writeHead(200, { "Content-Type": "application/json" });
-      res.end(JSON.stringify(result));
-
+      console.log("[Login] result:", result.success);
+      sendJson(res, 200, result.success, result.message);
     } catch (err) {
-      // JSON parse error or unexpected server error
-      res.writeHead(400, { "Content-Type": "application/json" });
-      res.end(JSON.stringify({ success: false, message: "Invalid request format." }));
-      console.log("Invalid request format.")
+      console.error("[Login] invalid request", err.message);
+      sendJson(res, 400, false, "Invalid request format.");
     }
   });
 };
+
+function sendJson(res, status, success, message) {
+  res.writeHead(status, {"Content-Type": "application/json"});
+  res.end(JSON.stringify({success, message}));
+}
 
 module.exports = {
   handleSignup,
   handleLogin,
 };
+
+/*
+------------------------------
+CONSIDER'S FOR FUTURE IMPLEMENTATIONS
+
+ - Signup and login are ALMOST generic:
+      handleAuth(req, res, serviceFn, label)
+*/
 
