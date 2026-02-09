@@ -1,11 +1,12 @@
 document.addEventListener("DOMContentLoaded", () => {
   const loginForm =
-    document.querySelector("form[action='/login']") || document.getElementById("loginForm");
+    document.querySelector("form[action='/login']") || document.getElementById("loginForm"); 
+    // querySelector only works cuz there's only one form, consider only using getElemtnByID, more concrete
   const signupForm =
     document.querySelector("form[action='/signup']") || document.getElementById("signupForm");
 
   if (loginForm) {
-    console.log("[Auth] Login form initialized");
+    console.log("[Auth] Login form initialized"); // consider better logger
     handleAuthForm(loginForm, "/login", "loginFeedback");
   }
 
@@ -24,7 +25,7 @@ function handleAuthForm(form, endpoint, feedbackId) {
     const feedbackEl = document.getElementById(feedbackId);
 
     // Reset UI state
-    feedbackEl.classList.remove("error", "success");
+    feedbackEl.classList.remove("error", "success"); //consider using toggle
 
     try {
       console.log(`[Auth] POST ${endpoint}`, data);
@@ -34,7 +35,10 @@ function handleAuthForm(form, endpoint, feedbackId) {
         body: JSON.stringify(data),
       });
 
-      console.log(`[Auth] Response status: ${response.status}`);
+      console.log(`[Auth] Response status: ${response.status}`); 
+      // comes from header and so is available immediately, so no need to unpack body
+      // optinoally do a check before reading JSON i.e. if(!response.ok) {...}
+      // https://www.geeksforgeeks.org/javascript/javascript-fetch-method/
 
       const result = await response.json();
       console.log("[Auth] Response body:", result);

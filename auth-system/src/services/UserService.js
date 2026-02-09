@@ -9,6 +9,9 @@ class UserService {
     this.usersPath = path.join(__dirname, "../../data/users.json");
   }
 
+  // consider using Promises
+  // always doing getAllUsers, very expensive operation, consider storing it and only retrieving when you detect a change in the DB
+
   getAllUsers() {
     try {
       const data = fs.readFileSync(this.usersPath, "utf8");
@@ -25,7 +28,7 @@ class UserService {
   }
 
   findUser(username) {
-    return this.getAllUsers().find(u => u.username === username);
+    return this.getAllUsers().find(u => u.username === username); // strict equality, same value, same type
   }
 
   async createUser(username, password) {

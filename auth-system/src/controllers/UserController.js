@@ -6,7 +6,7 @@ const handleSignup = (req, res) => {
   req.on("data", chunk => (body += chunk));
   req.on("end", async () => {
     try {
-      const { username, password } = JSON.parse(body);
+      const { username, password } = JSON.parse(body); // could have unexpected fields, also consider validation, also what if username or password keys aren't in JSON
 
       if (!username || !password) {
         console.log("[Signup] missing credentials");

@@ -7,8 +7,7 @@ const router = new Router();
 registerRoutes(router);
 
 const server = http.createServer((req, res) => {
-  // Add clear separator for each request
-  console.log("\n========================================");
+  console.log("\n========================================"); // Add clear separator for each request
   router.handle(req, res);
 });
 

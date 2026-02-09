@@ -2,5 +2,9 @@
   {
     "username": "newUser",
     "password": "$argon2id$v=19$m=65536,t=3,p=4$R3ndNMguTvrPCcxFglVJFQ$hxjIjzquEZAy57YwnK2jBmUjvfHIjJbd8N0NyM0jHds"
+  },
+  {
+    "username": "gigi",
+    "password": "$argon2id$v=19$m=65536,t=3,p=4$CT7nMWnn5yCk8Bcu5y2LGQ$HehElL8KjaLpSQGA9qVjp1hmulsLQcvVB6/7NxWWHtg"
   }
 ]

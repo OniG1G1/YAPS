@@ -2,7 +2,7 @@ const path = require("path");
 const fs = require("fs");
 
 class Router {
-  constructor(publicFolder = path.join(__dirname, "../../public")) {
+  constructor(publicFolder = path.join(__dirname, "../../public")) { // static assets
     this.routes = {};
     this.publicFolder = publicFolder;
 
@@ -10,13 +10,8 @@ class Router {
       console.warn(`[404] ${req.method} ${req.url}`);
       res.writeHead(404, { "Content-Type": "application/json" });
       res.end(JSON.stringify({ success: false, message: "404 - Not Found" }));
-    };
+    }; // not industry standard
 
-    this.invalidJsonHandler = (req, res) => {
-      console.warn(`[400] Invalid JSON`);
-      res.writeHead(400, { "Content-Type": "application/json" });
-      res.end(JSON.stringify({ success: false, message: "Invalid JSON" }));
-    };
   }
 
   /* ===== ROUTES ===== */
@@ -86,6 +81,8 @@ class Router {
       res.end();
       return;
     }
+
+    // make it work w/o extension, KISS
 
     // Static assets
     if (this.isStaticFile(pathName)) {
