@@ -10,11 +10,17 @@ class Router {
       console.warn(`[404] ${req.method} ${req.url}`);
       res.writeHead(404, { "Content-Type": "application/json" });
       res.end(JSON.stringify({ success: false, message: "404 - Not Found" }));
-    }; // not industry standard
+    }; // not industry standard, consider alt, what if you want to change default404
 
   }
 
+  // router should only match routes, and call handlers, not "make routes" themselves
+  // consider creating a logger
+
   /* ===== ROUTES ===== */
+
+  // routing logic should not depend on HTTP verb
+  // RESTful
 
   register(method, path, handler) {
     this.routes[`${method}:${path}`] = handler;
@@ -28,7 +34,7 @@ class Router {
     this.register("POST", path, handler);
   }
 
-  /* ===== REQUEST ENTRY ===== */
+  /* ===== REQUEST ENTRY ===== */ 
 
   handle(req, res) {
     const urlObj = new URL(req.url, `http://${req.headers.host}`);
@@ -37,13 +43,14 @@ class Router {
 
     console.log(`[REQ] ${method} ${pathName}`);
 
-    // Root redirect
+    // Root redirect      BAD, app policy, not routing behaviour (res.redirect() )
     if (method === "GET" && (pathName === "/" || pathName === "/index.html")) {
       console.log("↪ Redirecting / → /login");
       res.writeHead(302, { Location: "/login" });
       res.end();
       return;
     }
+    // reousrce URI, restful, URLs,
 
     // Pages / assets
     if (method === "GET") {
@@ -57,7 +64,7 @@ class Router {
 
     if (!handler) {
       console.warn(`[MISS] No API route for ${method} ${pathName}`);
-      return this.default404(req, res);
+      return this.default404(req, res); // BAD, is used multiple times, should be a catch-all option
     }
 
     console.log(`[API] ${method} ${pathName}`);
@@ -66,7 +73,7 @@ class Router {
 
   /* ===== GET HANDLING ===== */
 
-  handleGET(pathName, req, res) {
+  handleGET(pathName, req, res) { // overall horrid, could expose pages
     const ext = path.extname(pathName);
 
     // /page → /pages/page.html
@@ -119,6 +126,7 @@ class Router {
         return this.default404(req, res);
       }
 
+      // def seems off, at minimum would def remove from router and create separate class
       const mimeTypes = {
         ".html": "text/html",
         ".css": "text/css",

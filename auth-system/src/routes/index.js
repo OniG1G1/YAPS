@@ -7,3 +7,8 @@ function registerRoutes(router) {
 }
 
 module.exports = registerRoutes;
+
+// add other/misc routes
+
+// single routes file, don't refactor router
+// write routes file ...

@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
   const loginForm =
     document.querySelector("form[action='/login']") || document.getElementById("loginForm"); 
-    // querySelector only works cuz there's only one form, consider only using getElemtnByID, more concrete
+    // querySelector only works cuz there's only one form, consider only using getElemtnByID, more concrete (JS hooks)
   const signupForm =
     document.querySelector("form[action='/signup']") || document.getElementById("signupForm");
 
@@ -22,7 +22,7 @@ function handleAuthForm(form, endpoint, feedbackId) {
 
     const formData = new FormData(form);
     const data = Object.fromEntries(formData.entries());
-    const feedbackEl = document.getElementById(feedbackId);
+    const feedbackEl = document.getElementById(feedbackId); // what if it don't exist, also consider passing the element itself, rather than the ID
 
     // Reset UI state
     feedbackEl.classList.remove("error", "success"); //consider using toggle
@@ -45,7 +45,7 @@ function handleAuthForm(form, endpoint, feedbackId) {
 
       if (result.success) {
         console.log("[Auth] Authentication successful → redirect");
-        window.location.href = "/successfulLogin";
+        window.location.href = "/successfulLogin"; // instead of redicreting from front end, let back end do it
       } else {
         console.warn("[Auth] Authentication failed:", result.message);
         feedbackEl.textContent = result.message;

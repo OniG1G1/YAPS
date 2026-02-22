@@ -11,7 +11,7 @@ const handleSignup = (req, res) => {
       if (!username || !password) {
         console.log("[Signup] missing credentials");
         return sendJson(res, 400, false, "Missing username or password.")
-        return;
+        //return;
       }
 
       console.log("[Signup] processing user:", username);
@@ -19,9 +19,9 @@ const handleSignup = (req, res) => {
 
       console.log("[Signup] result:", result.success);
       sendJson(res, 200, result.success, result.message);
-    } catch (err) {
+    } catch (err) { // error handling, maybe create ErrorHandler class, generic error, but also specific, no exception handling
       console.error("[Signup] invalid request", err.message);
-      sendJson(res, 400, false, "Invalid request format.")
+      sendJson(res, 400, false, "Invalid request format.") // consider making a function, code duplication and if not corrected, may be there multiple times
     }
   });
 };

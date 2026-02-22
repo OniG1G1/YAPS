@@ -10,12 +10,12 @@ class UserService {
   }
 
   // consider using Promises
-  // always doing getAllUsers, very expensive operation, consider storing it and only retrieving when you detect a change in the DB
+  // always doing getAllUsers, very expensive operation, consider storing it and only retrieving when you detect a change in the DB, pagination
 
   getAllUsers() {
     try {
       const data = fs.readFileSync(this.usersPath, "utf8");
-      return data ? JSON.parse(data) : [];
+      return data ? JSON.parse(data) : []; // consider global error handling
     } catch (err) {
       return [];
     }
@@ -57,7 +57,7 @@ class UserService {
 
   async authenticateUser(username, password) {
     const user = this.findUser(username);
-    if (!user) {
+    if (!user) { // future implementation, 2 users have the same username
       console.log("[UserService] login failed: user not found");
       return response(false, "User not found.");
     }
