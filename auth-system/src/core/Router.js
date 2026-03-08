@@ -29,8 +29,26 @@ class Router {
   matchRoute(method, pathname) {
     return this.routes.find(route =>
       route.method === method &&
-      route.path === -pathname
+      route.path === pathname
     )
+  }
+
+  handle404(res) {
+    res.writeHead(404, { "Content-Type": "text/html; charset=UTF-8" });
+    res.end(`
+      <h1>404 Not Found</h1>
+      <p>The page you requested does not exist.</p>
+    `);
+  }
+
+  // 500 Internal Server Error
+  handle500(res, err) {
+    console.error("[Router] Internal Server Error:", err);
+    res.writeHead(500, { "Content-Type": "text/html; charset=UTF-8" });
+    res.end(`
+      <h1>500 Internal Server Error</h1>
+      <p>${err.message}</p>
+    `);
   }
 }
 

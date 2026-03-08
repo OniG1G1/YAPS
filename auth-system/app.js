@@ -1,5 +1,5 @@
 const http = require("http");
-const serveStatic = require(".src/utils/serveStatic");
+const serveStatic = require("./src/utils/serveStatic");
 
 const Router = require("./src/core/Router");
 const registerRoutes = require("./src/routes/index");
