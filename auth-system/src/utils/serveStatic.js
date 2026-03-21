@@ -12,19 +12,17 @@ const MIME_TYPES = {
 // process.cwd() is the current directory, good for if this fiel's current directory changes unlike relative paths, more robust
 
 async function serveStatic(req, res) {
+    
     const parsedUrl = new URL(req.url, `http://${req.headers.host}`);
     const pathname = parsedUrl.pathname;
 
     const filePath = path.join(STATIC_DIR, pathname);
 
-    // skip htmk pages, they go thru the router
-    if (filePath.endsWith(".html")) return false;
-
     // prevent directory traversal
     if(!filePath.startsWith(STATIC_DIR)) return false;
 
     try {
-        const stat = await fs.promises.stat(filePath); // recommended by doc rather than fs.access()
+        const stat = fs.statSync(filePath); // recommended by doc rather than fs.access()
 
         if (stat.isFile()) { // could be folder or symlink etc. you could end up streaming a whole folder
             const ext = path.extname(filePath).slice(1);
@@ -37,6 +35,7 @@ async function serveStatic(req, res) {
     } catch (err) {
         console.error("serveStatic error:", err) // do better error handling for next iteration
     }
+    // throw 404
 
     return false;
 }
