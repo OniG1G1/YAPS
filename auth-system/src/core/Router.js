@@ -1,7 +1,9 @@
 const path = require("path");
 const fs = require("fs");
 
-const STATIC_DIR = path.join(process.cwd(), "public");
+const STATIC_PATHNAME = "/public";
+const STATIC_DIR = path.join(process.cwd(), STATIC_PATHNAME);
+
 const MIME_TYPES = {
   default: "application/octet-stream",
   html: "text/html; charset=UTF-8",
@@ -12,6 +14,7 @@ const MIME_TYPES = {
 
 class Router {
   constructor(routes) {
+    //TODO: let's have a initializeRoutes() method
     this.routes = routes;
   }
 
@@ -38,40 +41,24 @@ class Router {
 
   handleStatic(req, res) {
     console.log("handling static");
+    //TODO: let's be DRY and move it to a constant outside the method, so we can easily change it in the future if we want to serve static files from a different directory or with a different prefix
     const parsedUrl = new URL(req.url, `http://${req.headers.host}`);
     const pathname = parsedUrl.pathname;
     console.log(pathname);
 
-    if (!pathname.startsWith("/static")) return false;
+    const filePath = path.join(STATIC_DIR, pathname.slice(STATIC_PATHNAME.length));
 
-    const filePath = path.join(STATIC_DIR, pathname.slice("/static".length));
-    const normalizedPath = path.normalize(filePath);
-
-    if (!normalizedPath.startsWith(STATIC_DIR)) {
+    // This is a sample compact well prioritized implementation
+    if (!pathname.startsWith(STATIC_PATHNAME) || !path.resolve(filePath).startsWith(STATIC_DIR)) {
+      return false;
+    } else if (fs.statSync(filePath).isFile()) {
+      //TODO statSync can throw an exception if it tries to read a non-existing file. That means the else of this else if is never reached.
+      this.serveStatic(filePath, res);
+    } else {
       this.handle404(res);
-      return true;
     }
-
-    try {
-      const stat = fs.statSync(normalizedPath);
-
-      if (!stat.isFile()) {
-        this.handle404(res);
-        return true;
-      }
-
-      this.serveStatic(normalizedPath, res);
-    } catch (err) {
-      if (err.code === "ENOENT") {
-        this.handle404(res);
-        return true;
-      }
-
-      console.error("handleStatic error:", err);
-      this.handleError(res, 500, "Internal Server Error");
-    }
-
     return true;
+
   }
 
   serveStatic(filePath, res) {
@@ -82,7 +69,7 @@ class Router {
     fs.createReadStream(filePath).pipe(res);
   }
 
-    handle404(res) {
+  handle404(res) {
     res.writeHead(404, { "Content-Type": "text/html; charset=UTF-8" });
     res.end(`
       <h1>404 Not Found</h1>
