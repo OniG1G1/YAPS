@@ -1,10 +1,10 @@
 const http = require("http");
 
 const Router = require("./src/core/Router");
-//const registerRoutes = require("./src/routes/index");
+const routes = require("./src/routes/index");
 
 //TODO: routes should be defined in a file in the config folder, and then loaded by the router, so we can have a single place where we define all the routes and their handlers, instead of having them scattered around the codebase. This also allows us to easily add new routes without having to modify the core router logic, and it keeps our code organized and maintainable.
-const router = new Router();
+const router = new Router(routes);
 //registerRoutes(router);
 
 const server = http.createServer((req, res) => {
@@ -20,7 +20,8 @@ const server = http.createServer((req, res) => {
   }
 
   if (!handled) {
-    throw new Error("Request was not handled by router.");
+    router.handle404(res)
+    //throw new Error("Request was not handled by router.");
   }
 
 });

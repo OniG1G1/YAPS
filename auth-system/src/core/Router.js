@@ -7,7 +7,7 @@ const STATIC_DIR = path.join(process.cwd(), STATIC_PATHNAME);
 const MIME_TYPES = {
   default: "application/octet-stream",
   html: "text/html; charset=UTF-8",
-  js: "text/javascript",
+  js: "application/javascript",
   css: "text/css",
   json: "application/json",
 };
@@ -19,9 +19,8 @@ class Router {
   }
 
   handleRoute(req, res) {
-    const parsedUrl = new URL(req.url, `http://${req.headers.host}`);
-    const pathname = parsedUrl.pathname;
-    const method = req.method.toUpperCase();
+    console.log("handling route");
+    const {pathname, method} = this.parseRequest(req);
 
     const route = this.routes.find(
       (r) => r.method === method && r.path === pathname,
@@ -32,7 +31,7 @@ class Router {
     try {
       route.handler(req, res);
     } catch (err) {
-      console.error("[Router] Error executing route handler:", err);
+      console.error("Error executing route handler:", err);
       this.handleError(res, 500, "Internal Server Error");
     }
 
@@ -41,24 +40,36 @@ class Router {
 
   handleStatic(req, res) {
     console.log("handling static");
-    //TODO: let's be DRY and move it to a constant outside the method, so we can easily change it in the future if we want to serve static files from a different directory or with a different prefix
-    const parsedUrl = new URL(req.url, `http://${req.headers.host}`);
-    const pathname = parsedUrl.pathname;
+    const { pathname } = this.parseRequest(req);
     console.log(pathname);
 
-    const filePath = path.join(STATIC_DIR, pathname.slice(STATIC_PATHNAME.length));
+    const filePath = path.join(
+      STATIC_DIR,
+      pathname.slice(STATIC_PATHNAME.length),
+    );
 
     // This is a sample compact well prioritized implementation
-    if (!pathname.startsWith(STATIC_PATHNAME) || !path.resolve(filePath).startsWith(STATIC_DIR)) {
+    if (
+      !pathname.startsWith(STATIC_PATHNAME) ||
+      !path.resolve(filePath).startsWith(STATIC_DIR)
+    ) {
       return false;
-    } else if (fs.statSync(filePath).isFile()) {
-      //TODO statSync can throw an exception if it tries to read a non-existing file. That means the else of this else if is never reached.
-      this.serveStatic(filePath, res);
-    } else {
+    }
+
+    try {
+      const stat = fs.statSync(filePath);
+
+      if (stat.isFile()) {
+        this.serveStatic(filePath, res);
+      } else {
+        this.handle404(res);
+      }
+    } catch (err) {
+      console.error("Error checking file:", filePath, err);// need to figure out how to deal with err, we currently don't use it (even though we pass as parameter)
       this.handle404(res);
     }
-    return true;
 
+    return true;
   }
 
   serveStatic(filePath, res) {
@@ -83,6 +94,14 @@ class Router {
       <h1>Error ${errorCode}</h1>
       <p>${message}</p>
     `);
+  }
+
+  parseRequest(req) {
+    const parsedUrl = new URL(req.url, 'https://${req.headers.host}');
+    return {
+      pathname: parsedUrl.pathname,
+      method: req.method.toUpperCase()
+    };
   }
 }
 

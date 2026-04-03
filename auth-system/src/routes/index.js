@@ -1,7 +1,7 @@
 // routes.js
 
-const authController = require("./controllers/authController");
-const pageController = require("./controllers/pageController");
+const authController = require("../controllers/AuthController");
+const pageController = require("../controllers/PageController");
 
 module.exports = [
 
