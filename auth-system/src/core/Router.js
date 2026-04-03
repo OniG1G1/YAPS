@@ -18,9 +18,68 @@ class Router {
     this.routes = routes;
   }
 
+  initializeRoutes() {
+    this.routes = require("../config/routes");
+  }
+
+  handle(req, res) {
+    const { pathname } = this.parseRequest(req);
+
+    if (this.isStaticRequest(pathname)) {
+      if (this.handleStatic(req, res)) return;
+
+      console.log("[ROUTER] Static file not found, 404");
+      return this.handle404(res);
+    }
+
+    if (this.handleRoute(req, res)) return;
+
+    // fallback
+    this.handle404(res);
+
+    /*
+    let handled = this.handleStatic(req, res);
+    //1. try to serve to static OR
+    // givin a 404 not found,
+    // do nothing so it can be served dynamically
+
+    if (!handled) {
+      handled = this.handleRoute(req, res);
+    }
+
+    if (!handled) {
+      this.handle404(res);
+      //throw new Error("Request was not handled by router.");
+    }
+      */
+  }
+
   handleRoute(req, res) {
+    const {method, pathname} = this.parseRequest(req)
+
+    const route = this.findRoute(method, pathname);
+
+    if (!route) {
+      console.log(`[ROUTER] No match for ${method} ${pathname}`);
+      return false;
+    }
+
+    console.log(`[ROUTER] No match for ${method} ${pathname}`);
+
+    try {
+      route.handler(req, res);
+
+      return true;
+    } catch (err) {
+      console.error(`[ROUTE] Error in handler for ${method} ${pathname}`, err);
+
+      this.handleError(res, 500, "Internal Server Error");
+      return true;
+    }
+
+    /*
     console.log("handling route");
-    const {pathname, method} = this.parseRequest(req);
+    const { pathname, method } = this.parseRequest(req);
 
     const route = this.routes.find(
       (r) => r.method === method && r.path === pathname,
@@ -36,23 +95,26 @@ class Router {
     }
 
     return true;
+    */
+  }
+
+  findRoute(method, pathname) {
+    return this.routes.find((r) => r.method === method && r.path === pathname);
+  }
+
+  isStaticRequest(pathname) {
+    return path.extname(pathname) !== "";
   }
 
   handleStatic(req, res) {
-    console.log("handling static");
     const { pathname } = this.parseRequest(req);
-    console.log(pathname);
 
-    const filePath = path.join(
-      STATIC_DIR,
-      pathname.slice(STATIC_PATHNAME.length),
-    );
+    console.log(`[STATIC] Request: ${pathname}`);
 
-    // This is a sample compact well prioritized implementation
-    if (
-      !pathname.startsWith(STATIC_PATHNAME) ||
-      !path.resolve(filePath).startsWith(STATIC_DIR)
-    ) {
+    const filePath = path.resolve(path.join(STATIC_DIR, pathname));
+
+    if (!filePath.startsWith(STATIC_DIR)) {
+      console.warn(`[STATIC] Blocked (outside public): ${filePath}`);
       return false;
     }
 
@@ -61,18 +123,23 @@ class Router {
 
       if (stat.isFile()) {
         this.serveStatic(filePath, res);
-      } else {
-        this.handle404(res);
+        return true;
       }
+      console.log(`[STATIC] Not a file (skipping): ${filePath}`);
+      return false;
     } catch (err) {
-      console.error("Error checking file:", filePath, err);// need to figure out how to deal with err, we currently don't use it (even though we pass as parameter)
-      this.handle404(res);
-    }
+      if (err.code === "ENOENT") {
+        console.log(`[STATIC] Not found (pass to router): ${pathname}`);
+        return false;
+      }
 
-    return true;
+      console.error(`[STATIC] Error accessing file: ${filePath}`, err);
+      return false;
+    }
   }
 
   serveStatic(filePath, res) {
+    console.log(`[STATIC] Serving file: ${filePath}`);
     const ext = path.extname(filePath).slice(1);
     const mime = MIME_TYPES[ext] || MIME_TYPES.default;
 
@@ -97,10 +164,10 @@ class Router {
   }
 
   parseRequest(req) {
-    const parsedUrl = new URL(req.url, 'https://${req.headers.host}');
+    const parsedUrl = new URL(req.url, "https://${req.headers.host}");
     return {
       pathname: parsedUrl.pathname,
-      method: req.method.toUpperCase()
+      method: req.method.toUpperCase(),
     };
   }
 }

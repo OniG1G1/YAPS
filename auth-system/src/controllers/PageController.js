@@ -1,7 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 
-const publicPath = path.join(__dirname, "../../public");
+const publicPath = path.join(__dirname, "../../public/pages");
 
 function sendHTML(res, filePath) {
   fs.readFile(filePath, (err, data) => {
@@ -21,6 +21,7 @@ const pageController = {
   },
 
   loginPage: (req, res) => {
+    console.log(path.join(publicPath, "login.html"));
     sendHTML(res, path.join(publicPath, "login.html"));
   },
 
