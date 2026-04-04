@@ -53,7 +53,7 @@ class Router {
       */
   }
 
-  handleRoute(req, res) {
+  handleRoute(req, res) { // same comment as handleStatic
     const { method, pathname } = this.parseRequest(req); // design flaw? used in every handle method, can we extract? other info needed besides method and pathname
 
     const route = this.findRoute(method, pathname);
@@ -104,7 +104,7 @@ class Router {
     return path.extname(pathname) !== "";
   }
 
-  handleStatic(req, res) {
+  handleStatic(req, res) { // no longer use convention of 'handled', needs refactoring
     const { pathname } = this.parseRequest(req);
 
     console.log(`[STATIC] Request: ${pathname}`);
