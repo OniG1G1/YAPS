@@ -6,5 +6,13 @@
   {
     "username": "gigi",
     "password": "$argon2id$v=19$m=65536,t=3,p=4$CT7nMWnn5yCk8Bcu5y2LGQ$HehElL8KjaLpSQGA9qVjp1hmulsLQcvVB6/7NxWWHtg"
+  },
+  {
+    "username": "helloWorld",
+    "password": "$argon2id$v=19$m=65536,t=3,p=4$WpZaxkkN9JM8PpWq0Dr2Mw$urcs0aiZxhfr144yfzIb3B71KDZss4e8CyczffIdLNY"
+  },
+  {
+    "username": "testHello",
+    "password": "$argon2id$v=19$m=65536,t=3,p=4$LEpxiwzDi95myjNWQ0JTxg$Scbi5Z+O9SrfVirP6Yy3xHsBXpUJOZrp1H4JDqRFaeE"
   }
 ]

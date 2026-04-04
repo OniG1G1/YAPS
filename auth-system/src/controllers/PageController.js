@@ -1,12 +1,15 @@
 const fs = require("fs");
 const path = require("path");
 
-const publicPath = path.join(__dirname, "../../public/pages");
+const VIEWS_DIR = path.join(__dirname, "../../public/pages");
 
-function sendHTML(res, filePath) {
+function render(res, viewName) {
+  const filePath = path.join(VIEWS_DIR, `${viewName}.html`)
+
   fs.readFile(filePath, (err, data) => {
     if (err) {
-      res.writeHead(404, { "Content-Type": "text/plain" });
+      console.error(`[VIEW] Not found: ${viewName}`);
+      res.writeHead(404, { "Content-Type": "text/plain" }); // insert Router handle404 method
       return res.end("Page not found");
     }
 
@@ -15,22 +18,21 @@ function sendHTML(res, filePath) {
   });
 }
 
-const pageController = {
+const pageController = { // for now req is not needed, but might need for later implementations (i.e. params)
   home: (req, res) => {
-    sendHTML(res, path.join(publicPath, "login.html"));
+    render(res, "login");
   },
 
   loginPage: (req, res) => {
-    console.log(path.join(publicPath, "login.html"));
-    sendHTML(res, path.join(publicPath, "login.html"));
+    render(res, "login");
   },
 
   signupPage: (req, res) => {
-    sendHTML(res, path.join(publicPath, "signup.html"));
+    render(res, "signup");
   },
 
   successfulLogin: (req, res) => {
-    sendHTML(res, path.join(publicPath, "successfulLogin.html"));
+    render(res, "successfulLogin");
   }
 };
 

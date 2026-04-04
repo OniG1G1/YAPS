@@ -28,6 +28,11 @@ module.exports = [
         path: "/signup",
         handler: pageController.signupPage
     },
+{
+        method: "GET",
+        path: "/successfulLogin",
+        handler: pageController.successfulLogin
+    },
     /*
     {
         method: "GET",

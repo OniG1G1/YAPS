@@ -1,13 +1,11 @@
-// controllers/authController.js
+const userController = require("./UserController");
 
 module.exports = {
-  login: (req, res) => {
-    res.writeHead(200, { "Content-Type": "application/json" });
-    res.end(JSON.stringify({ message: "Login successful (dummy)" }));
+  login(req, res) {
+    return userController.handleLogin(req, res);
   },
 
-  signup: (req, res) => {
-    res.writeHead(200, { "Content-Type": "application/json" });
-    res.end(JSON.stringify({ message: "Signup successful (dummy)" }));
-  },
+  signup(req, res) {
+    return userController.handleSignup(req, res);
+  }
 };

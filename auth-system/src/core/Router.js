@@ -13,9 +13,8 @@ const MIME_TYPES = {
 };
 
 class Router {
-  constructor(routes) {
-    //TODO: let's have a initializeRoutes() method
-    this.routes = routes;
+  constructor() {
+    this.initializeRoutes();
   }
 
   initializeRoutes() {
@@ -23,9 +22,9 @@ class Router {
   }
 
   handle(req, res) {
-    const { pathname } = this.parseRequest(req);
 
-    if (this.isStaticRequest(pathname)) {
+    if (this.isStaticRequest(req)) {
+      // cutting arguement, works for now, but later on might not work
       if (this.handleStatic(req, res)) return;
 
       console.log("[ROUTER] Static file not found, 404");
@@ -55,7 +54,7 @@ class Router {
   }
 
   handleRoute(req, res) {
-    const {method, pathname} = this.parseRequest(req)
+    const { method, pathname } = this.parseRequest(req); // design flaw? used in every handle method, can we extract? other info needed besides method and pathname
 
     const route = this.findRoute(method, pathname);
 
@@ -63,8 +62,6 @@ class Router {
       console.log(`[ROUTER] No match for ${method} ${pathname}`);
       return false;
     }
-
-    console.log(`[ROUTER] No match for ${method} ${pathname}`);
 
     try {
       route.handler(req, res);
@@ -102,7 +99,8 @@ class Router {
     return this.routes.find((r) => r.method === method && r.path === pathname);
   }
 
-  isStaticRequest(pathname) {
+  isStaticRequest(req) {
+    const { pathname } = this.parseRequest(req);
     return path.extname(pathname) !== "";
   }
 

@@ -7,12 +7,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (loginForm) {
     console.log("[Auth] Login form initialized"); // consider better logger
-    handleAuthForm(loginForm, "/login", "loginFeedback");
+    handleAuthForm(loginForm, "/api/login", "loginFeedback");
   }
 
   if (signupForm) {
     console.log("[Auth] Signup form initialized");
-    handleAuthForm(signupForm, "/signup", "signupFeedback");
+    handleAuthForm(signupForm, "/api/signup", "signupFeedback");
   }
 });
 
@@ -46,6 +46,7 @@ function handleAuthForm(form, endpoint, feedbackId) {
       if (result.success) {
         console.log("[Auth] Authentication successful → redirect");
         window.location.href = "/successfulLogin"; // instead of redicreting from front end, let back end do it
+        // bad, successfulLogin even singing up
       } else {
         console.warn("[Auth] Authentication failed:", result.message);
         feedbackEl.textContent = result.message;
