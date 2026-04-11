@@ -14,5 +14,9 @@
   {
     "username": "testHello",
     "password": "$argon2id$v=19$m=65536,t=3,p=4$LEpxiwzDi95myjNWQ0JTxg$Scbi5Z+O9SrfVirP6Yy3xHsBXpUJOZrp1H4JDqRFaeE"
+  },
+  {
+    "username": "trial123",
+    "password": "$argon2id$v=19$m=65536,t=3,p=4$pCN+D8gZ64BuO9ozZmhCtw$wv9wpo9lW03vMmhEkZEhgrejYKYMKjZNMTRDIKjiLtM"
   }
 ]

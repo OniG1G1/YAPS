@@ -1,7 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 
-const VIEWS_DIR = path.join(__dirname, "../../public/pages");
+const VIEWS_DIR = path.join(__dirname, "../../../public/pages");
 
 function render(res, viewName) {
   const filePath = path.join(VIEWS_DIR, `${viewName}.html`)

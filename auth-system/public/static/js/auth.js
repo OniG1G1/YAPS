@@ -7,12 +7,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (loginForm) {
     console.log("[Auth] Login form initialized"); // consider better logger
-    handleAuthForm(loginForm, "/api/login", "loginFeedback");
+    handleAuthForm(loginForm, "/api/auth/login", "loginFeedback");
   }
 
   if (signupForm) {
     console.log("[Auth] Signup form initialized");
-    handleAuthForm(signupForm, "/api/signup", "signupFeedback");
+    handleAuthForm(signupForm, "/api/auth/signup", "signupFeedback");
   }
 });
 

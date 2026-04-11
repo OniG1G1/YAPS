@@ -1,7 +1,7 @@
 // routes.js
 
 const authController = require("../controllers/api/AuthController");
-const pageController = require("../controllers/PageController");
+const pageController = require("../controllers/pages/PageController");
 
 module.exports = [
 
@@ -46,14 +46,14 @@ module.exports = [
 
     {
         method: "POST",
-        path: "/api/user/login",
+        path: "/api/auth/login",
         handler: authController.login
     },
     {
         method: "POST",
-        path: "/api/user/signup",
+        path: "/api/auth/signup",
         handler: authController.signup
-    },
+    }
     /*
     {
         method: "GET",
