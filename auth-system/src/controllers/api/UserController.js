@@ -1,4 +1,4 @@
-const userService = require("../services/UserService");
+const userService = require("../../services/UserService");
 
 const handleSignup = (req, res) => {
   let body = "";

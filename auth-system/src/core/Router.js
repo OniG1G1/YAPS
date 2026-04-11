@@ -1,7 +1,7 @@
 const path = require("path");
 const fs = require("fs");
 
-const STATIC_PATHNAME = "/public";
+const STATIC_PATHNAME = "/public/static";
 const STATIC_DIR = path.join(process.cwd(), STATIC_PATHNAME);
 
 const MIME_TYPES = {
@@ -23,9 +23,13 @@ class Router {
 
   handle(req, res) {
 
-    if (this.isStaticRequest(req)) {
-      // cutting arguement, works for now, but later on might not work
-      if (this.handleStatic(req, res)) return;
+
+    const staticFile = this.resolveStatic(req);
+
+    if (staticFile !== null) {
+      if (staticFile) {
+        return this.serveStatic(staticFile, req, res); // added req for future uses
+      }
 
       console.log("[ROUTER] Static file not found, 404");
       return this.handle404(res);
@@ -53,7 +57,8 @@ class Router {
       */
   }
 
-  handleRoute(req, res) { // same comment as handleStatic
+  handleRoute(req, res) {
+    // same comment as handleStatic
     const { method, pathname } = this.parseRequest(req); // design flaw? used in every handle method, can we extract? other info needed besides method and pathname
 
     const route = this.findRoute(method, pathname);
@@ -99,13 +104,13 @@ class Router {
     return this.routes.find((r) => r.method === method && r.path === pathname);
   }
 
-  isStaticRequest(req) {
+  resolveStatic(req) {
     const { pathname } = this.parseRequest(req);
-    return path.extname(pathname) !== "";
-  }
 
-  handleStatic(req, res) { // no longer use convention of 'handled', needs refactoring
-    const { pathname } = this.parseRequest(req);
+    if (path.extname(pathname) === "") {
+      // maybe remove later on
+      return null;
+    }
 
     console.log(`[STATIC] Request: ${pathname}`);
 
@@ -113,22 +118,23 @@ class Router {
 
     if (!filePath.startsWith(STATIC_DIR)) {
       console.warn(`[STATIC] Blocked (outside public): ${filePath}`);
-      return false;
+      return false; // malicious intent, path traversal, give 404
     }
 
     try {
       const stat = fs.statSync(filePath);
 
       if (stat.isFile()) {
-        this.serveStatic(filePath, res);
-        return true;
+        return filePath; // valid static file
       }
+      
       console.log(`[STATIC] Not a file (skipping): ${filePath}`);
-      return false;
+      return false; // static intent, but invalid, give 404
+
     } catch (err) {
       if (err.code === "ENOENT") {
-        console.log(`[STATIC] Not found (pass to router): ${pathname}`);
-        return false;
+        console.log(`[STATIC] Not found: ${pathname}`);
+        return false; // static intent, file missing, 404
       }
 
       console.error(`[STATIC] Error accessing file: ${filePath}`, err);
@@ -136,7 +142,7 @@ class Router {
     }
   }
 
-  serveStatic(filePath, res) {
+  serveStatic(filePath, req, res) {
     console.log(`[STATIC] Serving file: ${filePath}`);
     const ext = path.extname(filePath).slice(1);
     const mime = MIME_TYPES[ext] || MIME_TYPES.default;
@@ -161,8 +167,8 @@ class Router {
     `);
   }
 
-  parseRequest(req) {
-    const parsedUrl = new URL(req.url, "https://${req.headers.host}");
+  parseRequest(req) { // use later on for more complex parsing, but not at this phase
+    const parsedUrl = new URL(req.url, `https://${req.headers.host}`);
     return {
       pathname: parsedUrl.pathname,
       method: req.method.toUpperCase(),
