@@ -13,17 +13,15 @@ const MIME_TYPES = {
 };
 
 class Router {
-  constructor() {
-    this.initializeRoutes();
+  constructor(routes) {
+    this.initializeRoutes(routes);
   }
 
-  initializeRoutes() {
-    this.routes = require("../config/routes");
+  initializeRoutes(routes) {
+    this.routes = routes;
   }
 
   handle(req, res) {
-
-
     const staticFile = this.resolveStatic(req);
 
     if (staticFile !== null) {
@@ -127,10 +125,10 @@ class Router {
       if (stat.isFile()) {
         return filePath; // valid static file
       }
-      
+
       console.log(`[STATIC] Not a file (skipping): ${filePath}`);
       return false; // static intent, but invalid, give 404
-
+      
     } catch (err) {
       if (err.code === "ENOENT") {
         console.log(`[STATIC] Not found: ${pathname}`);
@@ -167,7 +165,8 @@ class Router {
     `);
   }
 
-  parseRequest(req) { // use later on for more complex parsing, but not at this phase
+  parseRequest(req) {
+    // use later on for more complex parsing, but not at this phase
     const parsedUrl = new URL(req.url, `https://${req.headers.host}`);
     return {
       pathname: parsedUrl.pathname,

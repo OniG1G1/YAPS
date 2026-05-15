@@ -58,7 +58,7 @@ module.exports = { // HTTP parsing AND input processing
 
         if (!result.success) {
           console.warn(`[Auth][Signup] failed user=${username} reason=${result.message}`);
-          return sendJson(res, 409, false, result.message);
+            return sendJson(res, 409, false, result.message);
         }
 
         console.info(`[Auth][Signup] success user=${username}`);
