@@ -1,3 +1,13 @@
+/**
+ * Composition Root / Executable Entry Point
+ *
+ * Responsibilities:
+ *  - Load configuration.
+ *  - Construct all application components.
+ *  - Wire dependencies together.
+ *  - Start the server.
+ */
+
 const config = require("./src/application/config/app");
 const Router = require("./src/application/routing/Router");
 const Application = require("./src/application/Application");
