@@ -1,0 +1,21 @@
+{
+  "name": "yaps",
+  "version": "1.0.0",
+  "private": true,
+  "description": "\"Yet Another Picture Sharing\" web application",
+  "homepage": "https://github.com/OniG1G1/Web-Dev#readme",
+  "bugs": {
+    "url": "https://github.com/OniG1G1/Web-Dev/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/OniG1G1/Web-Dev.git"
+  },
+  "license": "ISC",
+  "author": "Gianluigi Petrosillo Bautista",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
