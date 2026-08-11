@@ -1,16 +1,15 @@
+import { pageRoutes } from "./routes/pageRoutes.js";
 import { serveFile } from "./static.js";
+import { handlePostRequest } from "./controllers/postController.js";
 
-const routes = {
-    "/": ["public/index.html", "text/html"],
-    "/index": ["public/index.html", "text/html"],
-    "/login": ["public/login.html", "text/html"],
-    "/signup": ["public/signup.html", "text/html"],
-    "/styles.css": ["public/styles.css", "text/css"]
-};
+export async function handleRequest(request, response) { // temporary fix to satisfy the current implementation, then when more features and problems appear and demand an actual need, implementation WILL change
+    if (request.url.startsWith("/api/posts")) {
+        await handlePostRequest(request, response);
+        return;
+    }
 
-export async function handleRequest(request, response) {
     if (request.method === "GET") {
-        const route = routes[request.url]; // temporary fix where params aren't considered
+        const route = pageRoutes[request.url];
 
         if (route) {
             const [filePath, contentType] = route;
