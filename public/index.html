@@ -3,14 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>YAPs</title>
     <link rel="stylesheet" href="/styles.css">
 </head>
+
 <body>
-    <nav>
-    <a href="/login">Log In</a>
-</nav>
-    <h1>YAPs</h1>
-    <p>Shared Feed</p>
+    <header>
+        <h1>YAPs</h1>
+
+        <a href="/login">Log In</a>
+    </header>
+
+    <div class="app-layout">
+        <nav aria-label="Main navigation">
+            <a href="/" aria-current="page">Feed</a>
+        </nav>
+
+        <main>
+            <div id="feed">
+                <!-- Posts will be rendered here later. -->
+            </div>
+        </main>
+    </div>
 </body>
 </html>
