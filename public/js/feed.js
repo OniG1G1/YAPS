@@ -1,40 +1,55 @@
-console.log("test123");
-const res = await fetch("/api/posts");
-const posts = await res.json();
+const response = await fetch("/api/posts");
+const posts = await response.json();
 
 const feed = document.querySelector("#feed");
 
 for (const post of posts) {
+    const postElement = createPostElement(post);
+    feed.append(postElement);
+}
+
+function createPostElement(post) {
     const article = document.createElement("article");
+    article.classList.add("post-card");
+
+    /* Header content: username, profile picture, and timestamp*/
+    const header = document.createElement("header");
+    header.classList.add("post-header");
+
+    const creatorSection = document.createElement("div");
+    creatorSection.classList.add("post-creator");
 
     const profilePicture = document.createElement("img");
+    profilePicture.classList.add("profile-picture");
     profilePicture.src = post.profilePicture;
-    profilePicture.alt = `${post.creator}'s profile picture`;
-    
-    const creator = document.createElement("p");
-    creator.textContent = `@${post.creator}`;
 
-    const date = document.createElement("time");
-    date.dateTime = post.datePosted;
-    date.textContent = `${post.datePosted}`;
+    const username = document.createElement("span");
+    username.textContent = `@${post.creator}`;
 
+    creatorSection.append(profilePicture, username);
+
+    const timestamp = document.createElement("time");
+    timestamp.dateTime = post.datePosted;
+    timestamp.textContent = post.datePosted;
+
+    header.append(creatorSection, timestamp);
+
+    /* header */
     const image = document.createElement("img");
+    image.classList.add("post-image");
     image.src = post.image;
     image.alt = `Post by ${post.creator}`;
 
-    article.append(
-        profilePicture,
-        creator,
-        date,
-        image
-    );
+    /* optional caption */
+    article.append(header, image);
 
     if (post.caption !== null) {
         const caption = document.createElement("p");
-        caption.textContent = `Caption: ${post.caption}`;
+        caption.classList.add("caption");
+        caption.textContent = post.caption;
+
         article.append(caption);
     }
 
-    feed.append(article);
-    
+    return article;
 }
