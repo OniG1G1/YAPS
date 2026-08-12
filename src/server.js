@@ -13,7 +13,6 @@
         MIME/content type handling
 */
 
-
 import http from "node:http"
 import { handleRequest} from "./router.js"
 

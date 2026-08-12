@@ -1,24 +1,52 @@
 import { pageRoutes } from "./routes/pageRoutes.js";
-import { serveFile } from "./static.js";
-import { handlePostRequest } from "./controllers/postController.js";
+import { apiRoutes } from "./routes/apiRoutes.js"
+import { serveFile, serveStaticFile } from "./static.js";
 
-export async function handleRequest(request, response) { // temporary fix to satisfy the current implementation, then when more features and problems appear and demand an actual need, implementation WILL change
-    if (request.url.startsWith("/api/posts")) {
-        await handlePostRequest(request, response);
+export async function handleRequest(req, res) {
+    const url = new URL(req.url, `http://${req.headers.host}`);
+
+    const pathname = url.pathname;
+
+    // static assets
+    if (req.method === "GET" && pathname.startsWith("/public/")) {
+        const served = await serveStaticFile(pathname, res);
+
+        if (!served) {
+            send404(res);
+        }
+
         return;
     }
 
-    if (request.method === "GET") {
-        const route = pageRoutes[request.url];
+    // api routes
+    if (pathname.startsWith("/api/")) {
+        const handler = apiRoutes[pathname];
 
-        if (route) {
-            const [filePath, contentType] = route;
-            await serveFile(response, filePath, contentType);
+        if (!handler) {
+            send404(res);
+            return;
+        }
+
+        await handler(req, res);
+        return;
+    }
+
+    // page routes
+    if (req.method === "GET") {
+        const filePath = pageRoutes[pathname];
+        
+        if (filePath) { //page route found
+            await serveFile(res, filePath, "text/html");
             return;
         }
     }
 
-    response.statusCode = 404;
-    response.setHeader("Content-Type", "text/plain");
-    response.end("Page not found.");
+    // no match
+    send404(res);
+}
+
+function send404(res) {
+    res.statusCode = 404;
+    res.setHeader = "Content-Type", "text/plain";
+    res.end("Page not found.");
 }
