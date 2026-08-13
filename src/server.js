@@ -18,7 +18,23 @@ import { routeRequest} from "./router.js"
 
 const PORT = 3000;
 
-const server = http.createServer(routeRequest);
+const server = http.createServer(async (req, res) => {
+    try {
+        routeRequest(req, res);
+    } catch (error) {
+        console.error(error);
+
+        if (!res.headersSent) {
+            console.log("Internal Server Error.")
+            res.statusCode = 500;
+            res.setHeader("Content-Type", "text/plain");
+            res.end("Internal Server Error.")
+
+        } else if (!res.writableEnded) {
+            res.end();
+        }
+    }
+});
 
 server.listen(PORT, () => {
      console.log(`YAPs server listening on http://localhost:${PORT}`);

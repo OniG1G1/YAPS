@@ -1,14 +1,12 @@
-import { pageRoutes } from "./routes/pageRoutes.js";
-import { apiRoutes } from "./routes/apiRoutes.js"
+import { routes } from "./routes/routes.js";
 import { serveFile, serveStaticFile } from "./static.js";
 
-export async function routeRequest(req, res) {
-    const url = new URL(req.url, `https://${req.headers.host}`);
+export function routeRequest(req, res) {
+    const url = new URL(req.url, `http://${req.headers.host}`);
     const pathname = url.pathname
 
     if (routeStaticRequest(req,res,pathname)) return;
-    if (routeApiRequest(req,res,pathname)) return;
-    if (routePageRequest(req,res,pathname)) return;
+    if (routeDynamicRequest(req, res, pathname)) return;
 
     send404(res);
 }
@@ -34,34 +32,14 @@ function routeStaticRequest(req,res,pathname) {
     return true;
 }
 
-function routeApiRequest(req, res, pathname) {
-    if (!pathname.startsWith("/api/")) {
-        return false;
-    }
-
-    const handler = apiRoutes[pathname];
+function routeDynamicRequest(req, res, pathname) {
+    const handler = routes[req.method]?.[pathname];
 
     if (!handler) {
-        send404(res);
-        return true;
-    }
-
-    handler(req, res);
-    return true;
-}
-
-function routePageRequest(req, res, pathname) {
-    if (req.method !== "GET") {
         return false;
     }
 
-    const filePath = pageRoutes[pathname];
-
-    if (!filePath) {
-        return false;
-    }
-
-    serveFile(res, filePath, "text/html");
+    handler(req,res);
     return true;
 }
 

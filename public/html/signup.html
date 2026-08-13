@@ -1,25 +1,46 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sign Up | YAPs</title>
     <link rel="stylesheet" href="/public/css/styles.css">
 </head>
+
 <body>
-    <nav>
-    <a href="/">Back to Feed</a>
-</nav>
+    <header><nav>
+        <a href="/">Back to Feed</a>
+    </nav></header>
+    
 
-<main>
-    <h1>Sign Up</h1>
+    <main>
+        <h1>Sign Up</h1>
 
-    <!-- form later -->
+        <form id="signup-form" novalidate>
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" autocomplete="
+            email" required>
 
-    <p>
-        Already have an account?
-        <a href="/login">Log In</a>
-    </p>
-</main>
+            <label for="username">Username</label>
+            <input type="username" id="username" name="username" autocomplete="
+            username" required>
+
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" autocomplete="
+            password" required>
+
+            <p id="form-message" class="form-message" role="alert"></p>
+            <button type="submit">Log In</button>
+        </form>
+
+        <p>
+            Already have an account?
+            <a href="/login">Log In</a>
+        </p>
+    </main>
+
+    <script type="module" src="/public/js/signup.js"></script>
 </body>
+
 </html>

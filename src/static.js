@@ -1,6 +1,16 @@
-import { readFile } from "node:fs/promises";
+import fs from 'node:fs'
+import path from "node:path";
 
-export async function serveStaticFile(pathname, response) {
+const MIME_TYPES = {
+    ".html": "text/html",
+    ".css": "text/css",
+    ".js": "text/javascript",
+    ".jpg": "image/jpeg",
+    ".jpeg": "image/jpeg",
+    ".png": "image/png"
+};
+
+export function serveStaticFile(pathname, response) {
     // Temporary naive conversion.
     // Later: normalize and validate against directory traversal.
     const filePath = pathname.slice(1);
@@ -8,7 +18,7 @@ export async function serveStaticFile(pathname, response) {
     const contentType = getContentType(filePath);
 
     try {
-        await serveFile(response, filePath, contentType);
+        serveFile(response, filePath, contentType);
         return true;
     } catch (error) {
         if (error.code === "ENOENT") {
@@ -19,8 +29,8 @@ export async function serveStaticFile(pathname, response) {
     }
 }
 
-export async function serveFile(response, filePath, contentType) {
-    const content = await readFile(filePath);
+export function serveFile(response, filePath, contentType) {
+    const content = fs.readFileSync(filePath);
 
     response.statusCode = 200;
     response.setHeader("Content-Type", contentType);
@@ -28,25 +38,7 @@ export async function serveFile(response, filePath, contentType) {
 }
 
 function getContentType(filePath) {
-    if (filePath.endsWith(".css")) {
-        return "text/css";
-    }
+    const extension = path.extname(filePath).toLowerCase();
 
-    if (filePath.endsWith(".js")) {
-        return "text/javascript";
-    }
-
-    if (filePath.endsWith(".jpg") || filePath.endsWith(".jpeg")) {
-        return "image/jpeg";
-    }
-
-    if (filePath.endsWith(".png")) {
-        return "image/png";
-    }
-
-    if (filePath.endsWith(".html")) {
-        return "text/html";
-    }
-
-    return "application/octet-stream";
+    return MIME_TYPES[extension] ?? "application/octet-stream";
 }
