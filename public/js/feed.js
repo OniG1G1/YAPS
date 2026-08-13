@@ -3,16 +3,23 @@ const posts = await response.json();
 
 const feed = document.querySelector("#feed");
 
+if (posts.length === 0) {
+    const message = document.createElement("p");
+    message.classList.add("empty-feed-message");
+    message.textContent = "There are currently no posts.";
+
+    feed.append(message)
+} else {
+
 for (const post of posts) {
-    const postElement = createPostElement(post);
-    feed.append(postElement);
-}
+    feed.append(createPostElement(post));
+}}
 
 function createPostElement(post) {
     const article = document.createElement("article");
     article.classList.add("post-card");
 
-    /* Header content: username, profile picture, and timestamp*/
+    // Header
     const header = document.createElement("header");
     header.classList.add("post-header");
 
@@ -34,15 +41,15 @@ function createPostElement(post) {
 
     header.append(creatorSection, timestamp);
 
-    /* header */
+    // Post image
     const image = document.createElement("img");
     image.classList.add("post-image");
     image.src = post.image;
     image.alt = `Post by ${post.creator}`;
 
-    /* optional caption */
     article.append(header, image);
 
+    // Optional caption
     if (post.caption !== null) {
         const caption = document.createElement("p");
         caption.classList.add("caption");

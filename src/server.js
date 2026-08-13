@@ -14,11 +14,11 @@
 */
 
 import http from "node:http"
-import { handleRequest} from "./router.js"
+import { routeRequest} from "./router.js"
 
 const PORT = 3000;
 
-const server = http.createServer(handleRequest);
+const server = http.createServer(routeRequest);
 
 server.listen(PORT, () => {
      console.log(`YAPs server listening on http://localhost:${PORT}`);

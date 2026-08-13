@@ -1,6 +1,6 @@
 import { posts } from "../data/mockPosts.js";
 
-export async function handlePostRequest(req, res) {
+/*export async function handlePostRequest(req, res) {
     const url = new URL(req.url, `http://${req.headers.host}`);
     const pathname = url.pathname;
 
@@ -14,8 +14,9 @@ export async function handlePostRequest(req, res) {
     res.end("Post endpoint not found.");
 
 }
+*/
 
-function returnPosts(res) {
+export function returnPosts(req, res) {
     res.statusCode = 200;
     res.setHeader("Content-Type", "application/json");
     res.end(JSON.stringify(posts));
