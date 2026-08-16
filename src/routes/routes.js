@@ -1,3 +1,4 @@
+import { registerAccount } from "../controllers/accountController.js";
 import { returnPosts } from "../controllers/postController.js";
 import { serveFile } from "../static.js";
 
@@ -16,5 +17,9 @@ export const routes = {
 
         "/signup": (req, res) =>
             serveFile(res, "public/html/signup.html", "text/html")
+    },
+
+    POST: {
+        "/api/accounts": registerAccount
     }
 };

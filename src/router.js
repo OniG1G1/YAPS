@@ -48,4 +48,3 @@ function send404(res) {
     res.setHeader("Content-Type", "text/plain");
     res.end("Page not found.");
 }
-
