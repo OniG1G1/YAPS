@@ -4,25 +4,17 @@ import { serveFile, serveStaticFile } from "./static.js";
 export function routeRequest(req, res) {
     const url = new URL(req.url, `http://${req.headers.host}`);
     const pathname = url.pathname
-
     if (routeStaticRequest(req,res,pathname)) return;
     if (routeDynamicRequest(req, res, pathname)) return;
 
     send404(res);
 }
 
-function routeStaticRequest(req,res,pathname) {
-    
-    //const publicPath = path.join(__dirname, 'public', pathname);
+function routeStaticRequest(req, res, pathname) {
     if (req.method !== "GET" || !pathname.startsWith("/public/")) {
         return false;
     }
 
-    /*
-        if (fs.existsSync(publicPath) && !fs.statSync(publicPath).isDirectory()) {
-            return fs.createReadStream(publicPath).pipe(res);
-        }
-    */
     const served = serveStaticFile(pathname, res);
 
     if (!served) {

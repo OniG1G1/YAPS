@@ -20,22 +20,26 @@ const PORT = 3000;
 
 const server = http.createServer(async (req, res) => {
     try {
-        routeRequest(req, res);
+        await routeRequest(req, res);
     } catch (error) {
-        console.error(error);
-
-        if (!res.headersSent) {
-            console.log("Internal Server Error.")
-            res.statusCode = 500;
-            res.setHeader("Content-Type", "text/plain");
-            res.end("Internal Server Error.")
-
-        } else if (!res.writableEnded) {
-            res.end();
-        }
+        handleError(error, res);
     }
 });
 
 server.listen(PORT, () => {
      console.log(`YAPs server listening on http://localhost:${PORT}`);
 });
+
+function handleError(error, res) {
+    console.error(error);
+
+    if (!res.headersSent) {
+        console.log("Internal Server Error.");
+        res.statusCode = 500;
+        res.setHeader("Content-Type", "text/plain");
+        res.end("Internal Server Error.");
+
+    } else if (!res.writableEnded) {
+        res.end();
+    }
+}
