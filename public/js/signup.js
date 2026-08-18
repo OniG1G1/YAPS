@@ -1,6 +1,8 @@
 const form = document.querySelector("#signup-form");
 const message = document.querySelector("#form-message");
 
+// Network errors or HTML error responses will produce unhandled rejections?
+
 form.addEventListener("submit", async (event) => {
     event.preventDefault();
 
@@ -14,7 +16,12 @@ form.addEventListener("submit", async (event) => {
     }
 
     const accountData = createAccountData(email, username, password);
-    const registrationResult = await registerNewAccount(accountData);
+    try {
+        const registrationResult = await registerNewAccount(accountData);
+    } catch (error) {
+        console.error(error);
+        message.textContent = "Unable to contact the server."
+    }
 
     renderResult(registrationResult);
 });
@@ -36,7 +43,16 @@ async function registerNewAccount(accountData) {
         body: JSON.stringify(accountData)
     });
 
-    return response.json();
+    const result = await response.json();
+
+    if (!response.ok) {
+        return {
+            success: false,
+            message: result.mesage ?? "Registration was unsuccessful."
+        }
+    }
+
+    return result;
 }
 
 function renderResult(result) {

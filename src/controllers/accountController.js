@@ -12,11 +12,34 @@ export function registerAccount(req, res) {
         console.log({
             email: accountData.email,
             username: accountData.username,
-            passwrodReceived: Boolean(accountData.password)
-        })
-    });
+            passwordReceived: Boolean(accountData.password)
+        });
 
-    res.statusCode = 200;
-    res.setHeader("Content-Type", "application/json");
-    res.end(JSON.stringify({success: true}));
+        sendJson(res, 201, {success : true})
+    })
 }
+
+function sendJson(res, statusCode, json) {
+    res.statusCode = statusCode;
+    res.setHeader("Content-Type", "application/json");
+    res.end(JSON.stringify(json));
+}
+
+// consider a json-body reader responsible for:
+/*
+Rejecting unsupported Content-Type with 415.
+Enforcing a body-size limit and returning 413.
+Returning 400 for empty or malformed JSON.
+Handling aborted/erroring requests.
+Decoding chunks predictably.
+*/
+
+/*
+HTTP input
+  → parse JSON
+  → validate and normalize
+  → check uniqueness
+  → hash password
+  → persist account
+  → create HTTP response
+  */
