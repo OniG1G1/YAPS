@@ -5,8 +5,16 @@ import { fileURLToPath } from "node:url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+/*
 
-const PUBLIC_PREFIX = "/public/"
+ - be inside public dir ../public/smthng is valid
+ - be an actual file
+ - there is no double (..) traversal at all
+
+ too convuluted, too many steps
+
+*/
+export const PUBLIC_PREFIX = "/public/"
 const PUBLIC_ROOT = path.resolve(__dirname, "../public");
 
 const MIME_TYPES = {
@@ -49,7 +57,7 @@ function isInsidePublicDir(filePath) {
     const relativePath = path.relative(PUBLIC_ROOT, filePath);
 
     return (
-        !relativePath.startsWith("..") &&
+        !relativePath.startsWith("..") && // .contains("..")
         !path.isAbsolute(relativePath)
     );
 }
@@ -72,6 +80,11 @@ function getContentType(filePath) {
     return MIME_TYPES[extension] ?? "application/octet-stream";
 }
 
+/*
+    use cases:
+     - serving file already resolved to a safe absolute path
+     - serving html routes using caller-supplied relative paths
+*/
 export function serveFile(res, filePath, contentType) {
     res.statusCode = 200;
     res.setHeader("Content-Type", contentType);
@@ -92,3 +105,5 @@ export function serveFile(res, filePath, contentType) {
 
     stream.pipe(res);
 }
+
+//!relativePath.startsWith(`..${path.sep}`) &&

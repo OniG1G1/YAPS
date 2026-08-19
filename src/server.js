@@ -18,9 +18,9 @@ import { routeRequest} from "./router.js"
 
 const PORT = 3000;
 
-const server = http.createServer(async (req, res) => {
+const server = http.createServer((req, res) => {
     try {
-        await routeRequest(req, res);
+        routeRequest(req, res);
     } catch (error) {
         handleError(error, res);
     }

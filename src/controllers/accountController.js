@@ -2,6 +2,8 @@
 export function registerAccount(req, res) {
     let body = "";
 
+// overkill, check docs for simpler in req
+
     req.on("data", (chunk) => {
         body += chunk;
     })
@@ -19,6 +21,7 @@ export function registerAccount(req, res) {
     })
 }
 
+// move to utils
 function sendJson(res, statusCode, json) {
     res.statusCode = statusCode;
     res.setHeader("Content-Type", "application/json");

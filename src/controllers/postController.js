@@ -16,6 +16,8 @@ import { posts } from "../data/mockPosts.js";
 }
 */
 
+// functions without a class, class = namespace, 
+
 export function returnPosts(req, res) {
     res.statusCode = 200;
     res.setHeader("Content-Type", "application/json");

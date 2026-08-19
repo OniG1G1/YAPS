@@ -6,6 +6,8 @@ export const routes = {
     GET: {
         "/api/posts": returnPosts,
 
+        // this section of route table knows the disk layout and supplies cwd-relative paths, while static module already knows 'PUBLIC_ROOT'
+        // add src/views/...
         "/": (req, res) =>
             serveFile(res, "public/html/index.html", "text/html"),
 
