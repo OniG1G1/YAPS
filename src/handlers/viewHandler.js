@@ -1,9 +1,9 @@
 import path from "node:path"
 import {VIEWS_ROOT} from "../config.js"
-import { serveFile } from "../static.js"
+import { sendFile } from "../utils/respond.js"
 
 export default function serveView(viewName, res) {
     const filePath = path.join(VIEWS_ROOT, viewName);
 
-    serveFile(res,filePath, "text/html")
+    sendFile(res,filePath, "text/html")
 }

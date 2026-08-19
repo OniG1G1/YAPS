@@ -1,30 +1,38 @@
+import { send404 } from "./utils/respond.js";
 import { routes } from "./routes/routes.js";
-import { handleStaticRequest } from "./static.js";
+import { isStaticRoute, handleStaticRoute } from "./static.js";
+
+const contract = [
+    {
+        match: isStaticRoute,
+        handler: handleStaticRoute
+    },
+    {
+        match: isRegisteredRoute,
+        handler: handleRegisteredRoute
+    }
+];
 
 export default function routeRequest(req, res) {
     const url = new URL(req.url, `http://${req.headers.host}`);
     const pathname = url.pathname
 
-    if (handleStaticRequest(req,res,pathname)) return;
-    if (routeRegisteredRequest(req, res, pathname)) return;
+    const layer = contract.find(layer => layer.match(req, pathname));
+
+    if (layer) {
+        layer.handler(req,res,pathname);
+        return;
+    }
 
     send404(res);
-
 }
 
-function routeRegisteredRequest(req, res, pathname) {
-    const handler = routes[req.method]?.[pathname];
-    
-    if (!handler) {
-        return false;
-    }
-    
-    handler(req,res);
-    return true;
+function isRegisteredRoute(req, pathname) {
+    return Boolean(routes[req.method]?.[pathname])
 }
 
-function send404(res) {
-    res.statusCode = 404;
-    res.setHeader("Content-Type", "text/plain");
-    res.end("Page not found.");
+function handleRegisteredRoute(req, res, pathname) {
+    return routes[req.method][pathname](req, res)
 }
+
+
