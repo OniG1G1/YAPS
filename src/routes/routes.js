@@ -1,27 +1,21 @@
-import { registerAccount } from "../controllers/accountController.js";
-import { returnPosts } from "../controllers/postController.js";
-import { serveFile } from "../static.js";
+import * as accountController from "../controllers/accountController.js";
+import * as postController from "../controllers/postController.js";
+import serveView from "../handlers/viewHandler.js";
 
 export const routes = {
     GET: {
-        "/api/posts": returnPosts,
+        "/api/posts": postController.returnPosts,
 
-        // this section of route table knows the disk layout and supplies cwd-relative paths, while static module already knows 'PUBLIC_ROOT'
-        // add src/views/...
-        "/": (req, res) =>
-            serveFile(res, "public/html/index.html", "text/html"),
+        "/":        (req, res) => serveView("/index.html", res),
 
-        "/feed": (req, res) =>
-            serveFile(res, "public/html/index.html", "text/html"),
+        "/feed":    (req, res) => serveView("/index.html", res),
 
-        "/login": (req, res) =>
-            serveFile(res, "public/html/login.html", "text/html"),
+        "/login":   (req, res) => serveView("/login.html", res),
 
-        "/signup": (req, res) =>
-            serveFile(res, "public/html/signup.html", "text/html")
+        "/signup":  (req, res) => serveView("/signup.html", res),
     },
 
     POST: {
-        "/api/accounts": registerAccount
+        "/api/accounts": accountController.registerAccount
     }
 };

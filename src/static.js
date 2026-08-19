@@ -5,6 +5,20 @@ import { fileURLToPath } from "node:url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+export function handleStaticRequest(req, res, pathname) {
+    if (req.method !== "GET" || !pathname.startsWith(PUBLIC_PREFIX)) {
+        return false;
+    }
+
+    const served = serveStaticFile(pathname, res);
+
+    if (!served) {
+        send404(res);
+    }
+
+    return true;
+}
+
 /*
 
  - be inside public dir ../public/smthng is valid
@@ -14,7 +28,7 @@ const __dirname = path.dirname(__filename);
  too convuluted, too many steps
 
 */
-export const PUBLIC_PREFIX = "/public/"
+const PUBLIC_PREFIX = "/public/"
 const PUBLIC_ROOT = path.resolve(__dirname, "../public");
 
 const MIME_TYPES = {
@@ -26,7 +40,7 @@ const MIME_TYPES = {
     ".png": "image/png"
 };
 
-export function serveStaticFile(pathname, res) {
+function serveStaticFile(pathname, res) {
     const filePath = resolvePublicPath(pathname);
 
     if (!filePath) {        

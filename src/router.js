@@ -1,38 +1,24 @@
 import { routes } from "./routes/routes.js";
-import { serveStaticFile, PUBLIC_PREFIX } from "./static.js";
+import { handleStaticRequest } from "./static.js";
 
-export function routeRequest(req, res) {
+export default function routeRequest(req, res) {
     const url = new URL(req.url, `http://${req.headers.host}`);
     const pathname = url.pathname
 
-    if (routeStaticRequest(req,res,pathname)) return;
-    if (routeDynamicRequest(req, res, pathname)) return;
+    if (handleStaticRequest(req,res,pathname)) return;
+    if (routeRegisteredRequest(req, res, pathname)) return;
 
     send404(res);
+
 }
 
-// consider moving to static.js
-function routeStaticRequest(req, res, pathname) {
-    if (req.method !== "GET" || !pathname.startsWith(PUBLIC_PREFIX)) {
-        return false;
-    }
-
-    const served = serveStaticFile(pathname, res);
-
-    if (!served) {
-        send404(res);
-    }
-
-    return true;
-}
-
-function routeDynamicRequest(req, res, pathname) {
+function routeRegisteredRequest(req, res, pathname) {
     const handler = routes[req.method]?.[pathname];
-
+    
     if (!handler) {
         return false;
     }
-
+    
     handler(req,res);
     return true;
 }
