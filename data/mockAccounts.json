@@ -1,0 +1,14 @@
+[
+  {
+    "email": "asd",
+    "passwordHash": "8ce3ef476af91f61d0489db509e214bae6dc3d6d6699e76a2bf64a568845cd1365b6d78547908df6bce9673bebddef11aa5895bd83d0bb0be2ee6d223f4ee660",
+    "passwordSalt": "0c4712a0388b3543d7dffe6a745b4d3a",
+    "verified": false
+  },
+  {
+    "email": "asa",
+    "passwordHash": "688fe01f9951f5bb153ebfb22f80b68bf9130e8775b0430584f03c9b9ce4ec335d7df752a36d0680919c81e6c7fa4f1c8c5de3f1157cfee422e030a525019728",
+    "passwordSalt": "72bf40d3b5bd7617ca7b651cb28a49a2",
+    "verified": false
+  }
+]

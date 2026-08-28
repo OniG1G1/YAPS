@@ -3,7 +3,6 @@ import path from "node:path";
 
 import { PUBLIC_ROOT } from "./config.js";
 import { send404, sendFile } from "./utils/respond.js";
-import { fileURLToPath } from "node:url";
 
 const PUBLIC_PREFIX = "/public/"
 
@@ -32,7 +31,7 @@ export function handleStaticRoute(req, res, pathname) {
 }
 
 function resolvePublicFile(pathname) {
-    const relativePath = pathname.slice(PUBLIC_PREFIX.length);
+    const relativePath = pathname.slice(PUBLIC_PREFIX.length); // precondition that pathname DOES start with public prefix (following from pass from isStaticRoute())
     const filePath = path.resolve(PUBLIC_ROOT, relativePath);
 
     if (!isInsidePublicRoot(filePath)) {
@@ -46,7 +45,7 @@ function resolvePublicFile(pathname) {
     return filePath;
 }
 
-function isInsidePublicRoot(filePath) {
+function isInsidePublicRoot(filePath) { // necessity?
     const relativePath = path.relative(PUBLIC_ROOT, filePath);
 
     return (

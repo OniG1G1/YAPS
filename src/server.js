@@ -4,7 +4,7 @@ import routeRequest from "./router.js"
 
 const server = http.createServer((req, res) => {
     try {
-        routeRequest(req, res);
+        routeRequest(req, res); // may call async route which if returns a promise to reject, won't be captured, "await routeRequest(...)"
     } catch (error) {
         handleError(error, res);
     }

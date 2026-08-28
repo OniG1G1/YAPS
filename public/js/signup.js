@@ -7,29 +7,26 @@ form.addEventListener("submit", async (event) => {
     event.preventDefault();
 
     const email = form.email.value.trim();
-    const username = form.username.value.trim();
     const password = form.password.value;
 
-    if (!email || !username || !password) {
+    if (!email || !password) {
         message.textContent = "Please fill in all required fields.";
         return;
     }
 
-    const accountData = createAccountData(email, username, password);
+    const accountData = createAccountData(email, password);
     try {
         const registrationResult = await registerNewAccount(accountData);
+        renderResult(registrationResult);
     } catch (error) {
         console.error(error);
         message.textContent = "Unable to contact the server."
     }
-
-    renderResult(registrationResult);
 });
 
-function createAccountData(email, username, password) {
+function createAccountData(email, password) {
     return {
-        email,
-        username,
+        email,    
         password
     };
 }

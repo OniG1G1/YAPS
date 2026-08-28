@@ -1,18 +1,18 @@
-import * as accountController from "../controllers/accountController.js";
-import * as postController from "../controllers/postController.js";
-import serveView from "../handlers/viewHandler.js";
+import * as accountController   from "../controllers/accountController.js";
+import * as postController      from "../controllers/postController.js";
+import * as viewController      from "../controllers/viewController.js";
 
 export const routes = {
     GET: {
         "/api/posts": postController.returnPosts,
 
-        "/":        (req, res) => serveView("/index.html", res),
+        "/":        (req, res) => viewController.serveView("/index.html", res),
 
-        "/feed":    (req, res) => serveView("/index.html", res),
+        "/feed":    (req, res) => viewController.serveView("/index.html", res),
 
-        "/login":   (req, res) => serveView("/login.html", res),
+        "/login":   (req, res) => viewController.serveView("/login.html", res),
 
-        "/signup":  (req, res) => serveView("/signup.html", res),
+        "/signup":  (req, res) => viewController.serveView("/signup.html", res),
     },
 
     POST: {
