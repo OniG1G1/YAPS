@@ -14,6 +14,6 @@ const ACCOUNTS_FILE = path.join(
     PROJECT_ROOT,
     "data",
     "mockAccounts.json"
-);
+); // local DB replacement
 
 export { PROJECT_ROOT, VIEWS_ROOT, PUBLIC_ROOT, PORT, ACCOUNTS_FILE};

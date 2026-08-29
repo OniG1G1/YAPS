@@ -2,6 +2,11 @@ const form = document.querySelector("#signup-form");
 const message = document.querySelector("#form-message");
 
 // Network errors or HTML error responses will produce unhandled rejections?
+/**
+ * @todo fix message, display the returned message
+ * @todo distinguish network/server/parse failures
+ * @todo disable repeat submissions while pending (later)
+ */
 
 form.addEventListener("submit", async (event) => {
     event.preventDefault();

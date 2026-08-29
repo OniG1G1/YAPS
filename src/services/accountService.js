@@ -1,4 +1,4 @@
-import { findAccountByEmail, saveAccount } from "../data/accountStore.js";
+import { findAccountByEmail, saveAccount } from "../repositories/accountStore.js";
 import { hashPassword, verifyPassword} from "../security/password.js"
 
 export async function testStoredPassword(account) {

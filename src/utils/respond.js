@@ -1,5 +1,7 @@
 import fs from "node:fs";
 
+// ensure api erros use json where client expects json
+
 function send404(res) {
     res.statusCode = 404;
     res.setHeader("Content-Type", "text/plain");

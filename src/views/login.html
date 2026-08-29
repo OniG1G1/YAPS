@@ -1,37 +1,29 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Log In | YAPs</title>
     <link rel="stylesheet" href="/public/css/styles.css">
 </head>
+
 <body>
-    <header><nav>
-        <a href="/">Back to Feed</a>
-    </nav></header>
+    <header>
+        <nav>
+            <a href="/">Back to Feed</a>
+        </nav>
+    </header>
 
-<main>
-    <h1>Log In</h1>
-
-    <form id="login-form" novalidate>
+    <main>
+        <h1>Log In</h1>
+        <section>
+            <form id="login-form" novalidate>
                 <label for="email">Email</label>
-                <input
-                    id="email"
-                    name="email"
-                    type="email"
-                    autocomplete="email"
-                    required
-                >
+                <input id="email" name="email" type="email" autocomplete="email" required>
 
                 <label for="password">Password</label>
-                <input
-                    id="password"
-                    name="password"
-                    type="password"
-                    autocomplete="current-password"
-                    required
-                >
+                <input id="password" name="password" type="password" autocomplete="current-password" required>
 
                 <p id="form-message" class="form-message" role="alert"></p>
 
@@ -47,4 +39,5 @@
 
     <script type="module" src="/public/js/login.js"></script>
 </body>
+
 </html>

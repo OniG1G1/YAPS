@@ -1,6 +1,11 @@
 import fs from "node:fs";
 import { ACCOUNTS_FILE } from "../config.js"
 
+/**
+ * 
+ * @returns Data access layer for account data. Talks to the database (currently fs) and perform basic CRUD ops.
+ */
+
 function getAccounts() {
     const data = fs.readFileSync(ACCOUNTS_FILE, "utf-8");
     return JSON.parse(data);

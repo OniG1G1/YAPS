@@ -2,6 +2,9 @@ import * as accountController   from "../controllers/accountController.js";
 import * as postController      from "../controllers/postController.js";
 import * as viewController      from "../controllers/viewController.js";
 
+/**
+ * @todo check if leading '/' is necessary
+ */
 export const routes = {
     GET: {
         "/api/posts": postController.returnPosts,
